@@ -936,6 +936,22 @@
   gap: var(--space-1);
 }
 
+.blog__subheading {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: var(--space-10);
+  margin-bottom: var(--space-4);
+}
+
+.blog-card--upcoming {
+  opacity: 0.6;
+  border-style: dashed;
+}
+
 /* ============================================
    RESUME SECTION
    ============================================ */
@@ -1242,33 +1258,134 @@
 }
 
 /* ============================================
-   IMAGE PLACEHOLDERS (generated pattern)
+   ABOUT PHOTO
    ============================================ */
-.img-placeholder {
-  width: 100%;
-  height: 100%;
-  background: var(--color-surface-offset);
+.about__intro {
   display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.about__photo-wrapper {
+  flex-shrink: 0;
+}
+
+.about__photo {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  border: 2px solid var(--color-divider);
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
+  gap: var(--space-1);
   overflow: hidden;
+  position: relative;
 }
 
-.img-placeholder::before {
+.about__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about__photo-hint {
+  font-size: 10px;
+  color: var(--color-text-faint);
+  text-align: center;
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .about__photo {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+/* ============================================
+   BLOG INTRO
+   ============================================ */
+.blog__intro {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  max-width: 60ch;
+  line-height: 1.7;
+  margin-top: var(--space-3);
+}
+
+/* ============================================
+   ANIMATED HERO GLOW
+   ============================================ */
+.hero__glow--1 {
+  animation: glow-drift-1 12s ease-in-out infinite alternate;
+}
+
+.hero__glow--2 {
+  width: 400px;
+  height: 400px;
+  top: 60%;
+  left: -5%;
+  opacity: 0.04;
+  animation: glow-drift-2 15s ease-in-out infinite alternate;
+}
+
+@keyframes glow-drift-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-60px, 40px) scale(1.15); }
+}
+
+@keyframes glow-drift-2 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(40px, -30px) scale(1.2); }
+}
+
+/* ============================================
+   GLOWING BORDER ON FEATURED CARD
+   ============================================ */
+@property --glow-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.project-card--glow {
+  --glow-angle: 0deg;
+  position: relative;
+}
+
+.project-card--glow::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(135deg, var(--color-accent-highlight) 0%, transparent 50%),
-    linear-gradient(225deg, oklch(from var(--color-accent) l c h / 0.05) 0%, transparent 50%);
+  inset: -1px;
+  border-radius: var(--radius-lg);
+  background: conic-gradient(
+    from var(--glow-angle),
+    transparent 0%,
+    var(--color-accent) 10%,
+    transparent 20%,
+    transparent 100%
+  );
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-out);
+  animation: glow-spin 4s linear infinite;
 }
 
-.img-placeholder__text {
-  position: relative;
-  font-family: var(--font-display);
-  font-size: var(--text-xl);
-  font-weight: 600;
-  color: oklch(from var(--color-accent) l c h / 0.3);
-  letter-spacing: 0.05em;
+.project-card--glow:hover::before {
+  opacity: 1;
+}
+
+@keyframes glow-spin {
+  to { --glow-angle: 360deg; }
+}
+
+/* ============================================
+   TILT EFFECT ON CARDS (set via JS)
+   ============================================ */
+.project-card[style*="--rx"] {
+  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
 }

@@ -2,30 +2,19 @@
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize Lucide icons
   lucide.createIcons();
-
-  // Initialize Splitting.js for hero text
   Splitting();
-
-  // Stagger character animations
   initHeroAnimation();
-
-  // Theme toggle
   initTheme();
-
-  // Navigation
   initNavigation();
-
-  // Scroll progress
   initScrollProgress();
+  initAnimatedCounters();
+  initCardTilt();
 
-  // Custom cursor (desktop only)
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     initCustomCursor();
   }
 
-  // Active nav link tracking
   initActiveNav();
 });
 
@@ -76,7 +65,6 @@ function initNavigation() {
   let lastScroll = 0;
   let isMenuOpen = false;
 
-  // Scroll behavior: hide/show nav
   window.addEventListener('scroll', () => {
     const currentScroll = window.scrollY;
 
@@ -95,7 +83,6 @@ function initNavigation() {
     lastScroll = currentScroll;
   }, { passive: true });
 
-  // Mobile menu toggle
   if (mobileBtn) {
     mobileBtn.addEventListener('click', () => {
       isMenuOpen = !isMenuOpen;
@@ -106,7 +93,6 @@ function initNavigation() {
     });
   }
 
-  // Close mobile menu on link click
   const mobileLinks = mobileNav.querySelectorAll('a');
   mobileLinks.forEach(link => {
     link.addEventListener('click', () => {
@@ -131,6 +117,94 @@ function initScrollProgress() {
     const progress = (scrollTop / docHeight) * 100;
     progressBar.style.width = progress + '%';
   }, { passive: true });
+}
+
+// ============================================
+// ANIMATED COUNTERS (scroll-triggered)
+// ============================================
+function initAnimatedCounters() {
+  const counters = document.querySelectorAll('[data-counter]');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target.querySelector('.stat__number');
+        if (el && !el.dataset.animated) {
+          animateCounter(el);
+          el.dataset.animated = 'true';
+        }
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  counters.forEach(counter => observer.observe(counter));
+}
+
+function animateCounter(el) {
+  const target = parseFloat(el.dataset.target);
+  const decimals = parseInt(el.dataset.decimals) || 0;
+  const prefix = el.dataset.prefix || '';
+  const suffix = el.dataset.suffix || '';
+  const duration = 1200;
+  const startTime = performance.now();
+
+  function easeOut(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const easedProgress = easeOut(progress);
+    const current = target * easedProgress;
+
+    if (decimals > 0) {
+      el.textContent = prefix + current.toFixed(decimals) + suffix;
+    } else {
+      el.textContent = prefix + Math.round(current) + suffix;
+    }
+
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    }
+  }
+
+  requestAnimationFrame(update);
+}
+
+// ============================================
+// CARD TILT EFFECT (desktop only)
+// ============================================
+function initCardTilt() {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  const cards = document.querySelectorAll('.project-card');
+
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = ((y - centerY) / centerY) * -3;
+      const rotateY = ((x - centerX) / centerX) * 3;
+
+      card.style.setProperty('--rx', rotateX + 'deg');
+      card.style.setProperty('--ry', rotateY + 'deg');
+      card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+      card.style.transition = 'transform 0.1s linear, box-shadow 0.3s ease';
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+      card.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease';
+      card.style.removeProperty('--rx');
+      card.style.removeProperty('--ry');
+    });
+  });
 }
 
 // ============================================
@@ -161,7 +235,6 @@ function initCustomCursor() {
   }
   animateRing();
 
-  // Hover effect on interactive elements
   const interactives = document.querySelectorAll('a, button, [role="button"], .project-card, .blog-card, .highlight, .skill-tag, .contact-link');
   interactives.forEach(el => {
     el.addEventListener('mouseenter', () => {
