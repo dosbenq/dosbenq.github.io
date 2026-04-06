@@ -1,275 +1,245 @@
-// ============================================
-// INITIALIZATION
-// ============================================
-document.addEventListener('DOMContentLoaded', () => {
-  lucide.createIcons();
-  Splitting();
-  initHeroAnimation();
-  initTheme();
-  initNavigation();
-  initScrollProgress();
-  initAnimatedCounters();
-  initCardTilt();
+/* app.js — Portfolio Interactions */
+'use strict';
 
-  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-    initCustomCursor();
-  }
+/* ============================================================
+   THEME TOGGLE (dark default, no localStorage)
+   ============================================================ */
+(function () {
+  const html = document.documentElement;
+  // Default to dark as spec requires
+  let current = 'dark';
+  html.setAttribute('data-theme', current);
 
-  initActiveNav();
-});
-
-// ============================================
-// HERO CHARACTER ANIMATION
-// ============================================
-function initHeroAnimation() {
-  const chars = document.querySelectorAll('.hero__title .char');
-  chars.forEach((char, i) => {
-    char.style.animationDelay = `${0.3 + i * 0.03}s`;
-  });
-}
-
-// ============================================
-// THEME TOGGLE
-// ============================================
-function initTheme() {
-  const toggle = document.querySelector('[data-theme-toggle]');
-  const root = document.documentElement;
-  let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  root.setAttribute('data-theme', theme);
-  updateToggleIcon(toggle, theme);
-
-  if (toggle) {
-    toggle.addEventListener('click', () => {
-      theme = theme === 'dark' ? 'light' : 'dark';
-      root.setAttribute('data-theme', theme);
-      toggle.setAttribute('aria-label', 'Switch to ' + (theme === 'dark' ? 'light' : 'dark') + ' mode');
-      updateToggleIcon(toggle, theme);
+  function setTheme(t) {
+    current = t;
+    html.setAttribute('data-theme', t);
+    // Update all moon/sun icons
+    const moonSVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+    const sunSVG  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`;
+    document.querySelectorAll('[data-theme-toggle], [data-theme-toggle-mobile]').forEach(btn => {
+      btn.innerHTML = t === 'dark' ? moonSVG : sunSVG;
+      btn.setAttribute('aria-label', `Switch to ${t === 'dark' ? 'light' : 'dark'} mode`);
     });
   }
-}
 
-function updateToggleIcon(toggle, theme) {
-  if (!toggle) return;
-  toggle.innerHTML = theme === 'dark'
-    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
-    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-}
+  setTheme('dark');
 
-// ============================================
-// NAVIGATION
-// ============================================
-function initNavigation() {
-  const nav = document.querySelector('.nav');
-  const mobileBtn = document.querySelector('.mobile-menu-btn');
-  const mobileNav = document.querySelector('.mobile-nav');
-  let lastScroll = 0;
-  let isMenuOpen = false;
+  document.querySelectorAll('[data-theme-toggle], [data-theme-toggle-mobile]').forEach(btn => {
+    btn.addEventListener('click', () => setTheme(current === 'dark' ? 'light' : 'dark'));
+  });
+})();
 
-  window.addEventListener('scroll', () => {
-    const currentScroll = window.scrollY;
+/* ============================================================
+   CUSTOM CURSOR
+   ============================================================ */
+(function () {
+  const cursor = document.querySelector('.cursor');
+  const ring   = document.querySelector('.cursor-ring');
+  if (!cursor || !ring) return;
 
-    if (currentScroll > 100) {
-      nav.classList.add('nav--scrolled');
-    } else {
-      nav.classList.remove('nav--scrolled');
-    }
+  let mx = -100, my = -100;
+  let rx = -100, ry = -100;
+  let raf;
 
-    if (currentScroll > lastScroll && currentScroll > 200 && !isMenuOpen) {
-      nav.classList.add('nav--hidden');
-    } else {
-      nav.classList.remove('nav--hidden');
-    }
-
-    lastScroll = currentScroll;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX;
+    my = e.clientY;
+    cursor.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`;
   }, { passive: true });
 
-  if (mobileBtn) {
-    mobileBtn.addEventListener('click', () => {
-      isMenuOpen = !isMenuOpen;
-      mobileBtn.classList.toggle('active');
-      mobileNav.classList.toggle('open');
-      mobileBtn.setAttribute('aria-expanded', isMenuOpen);
-      document.body.style.overflow = isMenuOpen ? 'hidden' : '';
-    });
+  function animateRing() {
+    const dx = mx - rx;
+    const dy = my - ry;
+    rx += dx * 0.12;
+    ry += dy * 0.12;
+    ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
+    raf = requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Hover states
+  const interactives = 'a, button, [role="button"], input, textarea, select, label';
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest(interactives)) {
+      cursor.classList.add('is-hovering');
+      ring.classList.add('is-hovering');
+    }
+  });
+  document.addEventListener('mouseout', e => {
+    if (e.target.closest(interactives)) {
+      cursor.classList.remove('is-hovering');
+      ring.classList.remove('is-hovering');
+    }
+  });
+
+  document.addEventListener('mouseleave', () => {
+    cursor.style.opacity = '0';
+    ring.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', () => {
+    cursor.style.opacity = '1';
+    ring.style.opacity = '1';
+  });
+})();
+
+/* ============================================================
+   SCROLL PROGRESS BAR
+   ============================================================ */
+(function () {
+  const bar = document.querySelector('.progress-bar');
+  if (!bar) return;
+
+  function update() {
+    const scrollTop  = window.scrollY;
+    const docHeight  = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    bar.style.width = pct + '%';
   }
 
-  const mobileLinks = mobileNav.querySelectorAll('a');
-  mobileLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      isMenuOpen = false;
-      mobileBtn.classList.remove('active');
-      mobileNav.classList.remove('open');
-      mobileBtn.setAttribute('aria-expanded', false);
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+
+/* ============================================================
+   NAV SCROLL BEHAVIOR
+   ============================================================ */
+(function () {
+  const nav = document.querySelector('.nav');
+  if (!nav) return;
+
+  let lastY = 0;
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    if (y > 60) {
+      nav.classList.add('scrolled');
+    } else {
+      nav.classList.remove('scrolled');
+    }
+    lastY = y;
+  }, { passive: true });
+})();
+
+/* ============================================================
+   MOBILE MENU
+   ============================================================ */
+(function () {
+  const hamburger  = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileToggle = document.querySelector('[data-theme-toggle-mobile]');
+  if (!hamburger || !mobileMenu) return;
+
+  // Show mobile theme toggle on small screens
+  function checkMobile() {
+    if (window.innerWidth <= 768) {
+      if (mobileToggle) mobileToggle.style.display = 'flex';
+    } else {
+      if (mobileToggle) mobileToggle.style.display = 'none';
+      mobileMenu.classList.remove('open');
+      hamburger.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+    }
+  }
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+
+  hamburger.addEventListener('click', () => {
+    const open = hamburger.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', String(open));
+    mobileMenu.classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+
+  // Close on link click
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      mobileMenu.classList.remove('open');
       document.body.style.overflow = '';
     });
   });
-}
+})();
 
-// ============================================
-// SCROLL PROGRESS
-// ============================================
-function initScrollProgress() {
-  const progressBar = document.querySelector('.scroll-progress');
+/* ============================================================
+   ANIMATED NUMBER COUNTERS
+   Triggers when the stat element enters view
+   ============================================================ */
+(function () {
+  const items = document.querySelectorAll('[data-count], [data-count-decimal]');
+  if (!items.length) return;
 
-  window.addEventListener('scroll', () => {
-    const scrollTop = window.scrollY;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = (scrollTop / docHeight) * 100;
-    progressBar.style.width = progress + '%';
-  }, { passive: true });
-}
+  const easeOutQuart = t => 1 - Math.pow(1 - t, 4);
 
-// ============================================
-// ANIMATED COUNTERS (scroll-triggered)
-// ============================================
-function initAnimatedCounters() {
-  const counters = document.querySelectorAll('[data-counter]');
+  function animateCount(el) {
+    const isDecimal  = el.hasAttribute('data-count-decimal');
+    const target     = isDecimal
+      ? parseFloat(el.getAttribute('data-count-decimal'))
+      : parseInt(el.getAttribute('data-count'), 10);
+    const prefix     = el.getAttribute('data-prefix') || '';
+    const suffix     = el.getAttribute('data-suffix') || '';
+    const duration   = 1200;
+    const startTime  = performance.now();
 
-  const observer = new IntersectionObserver((entries) => {
+    function tick(now) {
+      const elapsed  = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased    = easeOutQuart(progress);
+      const value    = isDecimal
+        ? (target * eased).toFixed(2)
+        : Math.round(target * eased);
+      el.textContent = prefix + value + suffix;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  const io = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        const el = entry.target.querySelector('.stat__number');
-        if (el && !el.dataset.animated) {
-          animateCounter(el);
-          el.dataset.animated = 'true';
-        }
-        observer.unobserve(entry.target);
+        animateCount(entry.target);
+        io.unobserve(entry.target);
       }
     });
   }, { threshold: 0.5 });
 
-  counters.forEach(counter => observer.observe(counter));
-}
+  items.forEach(el => io.observe(el));
+})();
 
-function animateCounter(el) {
-  const target = parseFloat(el.dataset.target);
-  const decimals = parseInt(el.dataset.decimals) || 0;
-  const prefix = el.dataset.prefix || '';
-  const suffix = el.dataset.suffix || '';
-  const duration = 1200;
-  const startTime = performance.now();
-
-  function easeOut(t) {
-    return 1 - Math.pow(1 - t, 3);
-  }
-
-  function update(now) {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const easedProgress = easeOut(progress);
-    const current = target * easedProgress;
-
-    if (decimals > 0) {
-      el.textContent = prefix + current.toFixed(decimals) + suffix;
-    } else {
-      el.textContent = prefix + Math.round(current) + suffix;
-    }
-
-    if (progress < 1) {
-      requestAnimationFrame(update);
-    }
-  }
-
-  requestAnimationFrame(update);
-}
-
-// ============================================
-// CARD TILT EFFECT (desktop only)
-// ============================================
-function initCardTilt() {
-  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-
-  const cards = document.querySelectorAll('.project-card');
-
-  cards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-
-      const rotateX = ((y - centerY) / centerY) * -3;
-      const rotateY = ((x - centerX) / centerX) * 3;
-
-      card.style.setProperty('--rx', rotateX + 'deg');
-      card.style.setProperty('--ry', rotateY + 'deg');
-      card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
-      card.style.transition = 'transform 0.1s linear, box-shadow 0.3s ease';
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = '';
-      card.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease';
-      card.style.removeProperty('--rx');
-      card.style.removeProperty('--ry');
-    });
+/* ============================================================
+   SMOOTH SCROLL FOR NAV LINKS
+   ============================================================ */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href');
+    if (id === '#') return;
+    const target = document.querySelector(id);
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-}
+});
 
-// ============================================
-// CUSTOM CURSOR
-// ============================================
-function initCustomCursor() {
-  const dot = document.querySelector('.cursor-dot');
-  const ring = document.querySelector('.cursor-ring');
+/* ============================================================
+   ACTIVE NAV LINK (Intersection Observer)
+   ============================================================ */
+(function () {
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const navLinks = document.querySelectorAll('.nav__links a[href^="#"]');
 
-  if (!dot || !ring) return;
-
-  let mouseX = 0, mouseY = 0;
-  let ringX = 0, ringY = 0;
-
-  document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    dot.style.left = mouseX - 4 + 'px';
-    dot.style.top = mouseY - 4 + 'px';
-  });
-
-  function animateRing() {
-    ringX += (mouseX - ringX) * 0.15;
-    ringY += (mouseY - ringY) * 0.15;
-    ring.style.left = ringX - 16 + 'px';
-    ring.style.top = ringY - 16 + 'px';
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
-
-  const interactives = document.querySelectorAll('a, button, [role="button"], .project-card, .blog-card, .highlight, .skill-tag, .contact-link');
-  interactives.forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      dot.classList.add('hovering');
-      ring.classList.add('hovering');
-    });
-    el.addEventListener('mouseleave', () => {
-      dot.classList.remove('hovering');
-      ring.classList.remove('hovering');
-    });
-  });
-}
-
-// ============================================
-// ACTIVE NAV LINK
-// ============================================
-function initActiveNav() {
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav__links a');
-
-  const observer = new IntersectionObserver((entries) => {
+  const io = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        const id = entry.target.getAttribute('id');
+        const id = entry.target.id;
         navLinks.forEach(link => {
-          link.classList.remove('active');
-          if (link.getAttribute('href') === '#' + id) {
-            link.classList.add('active');
-          }
+          const active = link.getAttribute('href') === `#${id}`;
+          link.style.color = active
+            ? 'var(--color-text)'
+            : 'var(--color-text-muted)';
         });
       }
     });
-  }, {
-    rootMargin: '-30% 0px -70% 0px'
-  });
+  }, { rootMargin: '-40% 0px -55% 0px' });
 
-  sections.forEach(section => observer.observe(section));
-}
+  sections.forEach(s => io.observe(s));
+})();
