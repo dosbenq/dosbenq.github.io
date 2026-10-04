@@ -8,6 +8,7 @@
   .m{font-family:"Overpass Mono",monospace}
 </style></head>
 <body>
+<script src="timeline.js"></script>
 <svg id="stage" width="1280" height="720" viewBox="0 0 1280 720"><defs id="defs"></defs></svg>
 <script>
 /* The Long Way Round: a code-drawn film. render(t) draws the frame at t seconds. */
@@ -27,6 +28,27 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 const back = t => { const c = 1.7; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
 const prog = (t, a, b) => clamp((t - a) / (b - a));
+
+// Scene times, sync beats and captions come from the narration (timeline.js).
+const TL = window.TIMELINE;
+const SC = Object.fromEntries(TL.scenes.map(s => [s.name, s]));
+const at = (beat, scene) => TL.beats[beat] - SC[scene].start;
+const E = {
+  econ: at('delhiEcon', 'delhi') - .2,
+  blind: at('camera', 'drive') - .2,
+  tasks: at('tasks', 'doubt'),
+  biz: at('bizSense', 'doubt'),
+  recalc: at('notJustHow', 'recalc') + .9,
+  turn: at('turn', 'recalc'),
+  strategy: at('strategy', 'duke') - .2,
+  design: at('design', 'duke'),
+  after: at('after', 'duke'),
+  people: at('people', 'duke'),
+  trust: at('trust', 'duke') - .15,
+  built: at('builtOne', 'pointsmax'),
+  points: at('points', 'pointsmax'),
+  maybe: at('maybe', 'finale') - .2,
+};
 
 const C = {
   ink: '#0b1220', navy: '#16213a', paper: '#ece5d3', dim: '#8f9ab0', sodium: '#f5a63d', rust: '#a3530a', signal: '#ff6b57', go: '#69d5ae',
@@ -173,7 +195,7 @@ function scene(start, end, build) {
 }
 
 // 1. Title: a bright morning on the open road
-scene(0, 6.5, (g) => {
+scene(SC.title.start, SC.title.end, (g) => {
   el('rect', { width: 1280, height: 720, fill: grad([[0, '#8cc4ef'], [1, '#fff0d8']]) }, g);
   const glow = el('radialGradient', { id: 'sunGlow' }, defs);
   el('stop', { offset: 0, 'stop-color': '#fff8e1', 'stop-opacity': 1 }, glow);
@@ -201,7 +223,7 @@ scene(0, 6.5, (g) => {
 });
 
 // 2. Delhi: engineering and economics
-scene(6.5, 19, (g) => {
+scene(SC.delhi.start, SC.delhi.end, (g) => {
   el('rect', { width: 1280, height: 720, fill: grad([[0, '#f39f6a'], [1, '#ffe6c4']]) }, g);
   el('circle', { cx: 1040, cy: 470, r: 120, fill: '#fff0c8', opacity: .8 }, g);
   const city = el('g', { fill: '#c0705a' }, g);
@@ -232,16 +254,16 @@ scene(6.5, 19, (g) => {
       set(o.c, { transform: `translate(${o.x} ${o.y + Math.sin(t * 2 + i) * 8}) scale(${Math.max(.01, p)})` });
     });
     right.forEach((o, i) => {
-      const p = back(prog(t, 6.5 + i * .25, 7 + i * .25));
+      const p = back(prog(t, E.econ + i * .25, E.econ + .5 + i * .25));
       set(o.c, { transform: `translate(${o.x} ${o.y + Math.sin(t * 2 + i + 1) * 8}) scale(${Math.max(.01, p)})` });
     });
     lt.setAttribute('opacity', prog(t, .8, 1.4));
-    rt.setAttribute('opacity', prog(t, 6.5, 7.1));
+    rt.setAttribute('opacity', prog(t, E.econ, E.econ + .6));
   };
 });
 
 // 3. Bengaluru: HARMAN, signs from the map
-scene(19, 31, (g) => {
+scene(SC.drive.start, SC.drive.end, (g) => {
   el('rect', { width: 1280, height: 720, fill: grad([[0, '#3f86d6'], [1, '#c6e6ff']]) }, g);
   el('circle', { cx: 1080, cy: 150, r: 70, fill: '#fff3c4', opacity: .9 }, g);
   const sky = el('g', {}, g);
@@ -256,7 +278,7 @@ scene(19, 31, (g) => {
   el('rect', { y: 575, width: 1280, height: 90, fill: '#2a2f3a' }, g);
   const dashes = el('g', {}, g);
   for (let i = 0; i < 24; i++) el('rect', { x: i * 80, y: 617, width: 44, height: 6, fill: '#e9e2cf' }, dashes);
-  const signs = [50, 80, 30, 60, 70, 50].map((v, i) => {
+  const signs = [50, 80, 30, 60, 70, 50, 80, 60, 90].map((v, i) => {
     const s = el('g', {}, g);
     el('rect', { x: -3, y: -100, width: 6, height: 110, fill: '#9aa3b2' }, s);
     el('circle', { cx: 0, cy: -120, r: 28, fill: '#fff', stroke: '#d62f2f', 'stroke-width': 7 }, s);
@@ -279,11 +301,11 @@ scene(19, 31, (g) => {
     // the car arrives with the wipe, so it is already in place from the start
     set(car.g, { transform: `translate(430 ${612 + Math.sin(t * 18) * 1.5})`, display: t >= .75 ? 'inline' : 'none' });
     car.spin(speed * 2);
-    const blind = t > 7.8;
+    const blind = t > E.blind;
     camDot.setAttribute('fill', blind ? C.signal : C.go);
     camTxt.textContent = blind ? 'CAMERA BLIND' : 'CAMERA ON';
     signs.forEach(o => {
-      const x = 1400 + o.i * 380 - (speed - 1200);
+      const x = 2600 + o.i * 380 - 420 * (t - E.blind + 5.8);
       set(o.s, { transform: `translate(${x} 585)` });
       o.tag.setAttribute('opacity', blind && x < 900 ? 1 : 0);
     });
@@ -291,7 +313,7 @@ scene(19, 31, (g) => {
 });
 
 // 4. The doubt
-scene(31, 40.5, (g) => {
+scene(SC.doubt.start, SC.doubt.end, (g) => {
   el('rect', { width: 1280, height: 720, fill: '#e3e9f1' }, g);
   el('rect', { x: 820, y: 90, width: 360, height: 300, rx: 8, fill: '#9cc6ee' }, g);
   for (let i = 0; i < 5; i++) el('rect', { x: 840 + i * 68, y: 390 - (90 + i * 37 % 120), width: 52, height: 90 + i * 37 % 120, fill: '#5d79a8' }, g);
@@ -316,17 +338,17 @@ scene(31, 40.5, (g) => {
   return t => {
     av.blink(t % 2.7 > 2.55);
     tickets.forEach((tk, i) => {
-      const p = ease(prog(t, 2.4 + i * .5, 2.9 + i * .5));
+      const p = ease(prog(t, E.tasks - .3 + i * .5, E.tasks + .2 + i * .5));
       set(tk, { transform: `translate(${900 - (i % 2) * 14} ${lerp(-60, 540 - i * 34, p)}) rotate(${(i % 3 - 1) * 3})` });
     });
-    const b = back(prog(t, 5.6, 6.2));
-    bubble.setAttribute('opacity', prog(t, 5.6, 5.9));
+    const b = back(prog(t, E.biz, E.biz + .6));
+    bubble.setAttribute('opacity', prog(t, E.biz, E.biz + .3));
     set(bubble, { transform: `translate(700 300) scale(${Math.max(.01, b)}) translate(-700 -300)` });
   };
 });
 
 // 5. Road closed, recalculating (top-down map)
-scene(40.5, 48, (g) => {
+scene(SC.recalc.start, SC.recalc.end, (g) => {
   el('rect', { width: 1280, height: 720, fill: '#141c33' }, g);
   const streets = el('g', { stroke: '#26314f', 'stroke-width': 26 }, g);
   [200, 520, 840, 1160].forEach(x => el('line', { x1: x, y1: 0, x2: x, y2: 720 }, streets));
@@ -358,30 +380,30 @@ scene(40.5, 48, (g) => {
   oldRoute.setAttribute('stroke-dasharray', '390 390');
   return t => {
     let x = 520, y, rot = 0;
-    const up = ease(prog(t, 0, 3));
-    if (t < 4.6) y = lerp(760, 380, up);
+    const up = ease(prog(t, 0, E.recalc - .1));
+    if (t < E.turn + .1) y = lerp(760, 380, up);
     else {
-      const turn = ease(prog(t, 4.6, 5.3));
-      const go = ease(prog(t, 5.3, 7.4));
+      const turn = ease(prog(t, E.turn + .1, E.turn + .8));
+      const go = ease(prog(t, E.turn + .8, E.turn + 2.9));
       y = lerp(380, 360, turn); rot = 90 * turn; x = 520 + go * 820;
     }
     set(car, { transform: `translate(${x} ${y}) rotate(${rot})` });
-    blinker.setAttribute('opacity', t > 3.3 && t < 5.3 && Math.floor(t * 2.5) % 2 ? 1 : 0);
+    blinker.setAttribute('opacity', t > E.recalc + .2 && t < E.turn + .8 && Math.floor(t * 2.5) % 2 ? 1 : 0);
     oldRoute.setAttribute('stroke-dashoffset', 390 - 390 * up);
-    oldRoute.setAttribute('opacity', t < 4.3 ? 1 : 0.15);
-    const nr = ease(prog(t, 4.1, 5.2));
+    oldRoute.setAttribute('opacity', t < E.turn - .2 ? 1 : 0.15);
+    const nr = ease(prog(t, E.turn - .4, E.turn + .7));
     newRoute.setAttribute('stroke-dashoffset', pathLen - 1140 * nr);
-    newRoute.setAttribute('opacity', t > 4.1 ? 1 : 0);
-    const recalc = t > 3.1 && t < 4.5;
+    newRoute.setAttribute('opacity', t > E.turn - .4 ? 1 : 0);
+    const recalc = t > E.recalc && t < E.turn;
     arrowBox.setAttribute('fill', recalc ? C.signal : C.sodium);
-    hudArrow.setAttribute('transform', t >= 4.5 ? 'rotate(90 32 32)' : '');
-    hudSmall.textContent = recalc ? 'PLEASE WAIT' : t >= 4.5 ? 'NOW' : 'IN 300 M';
-    hudBig.textContent = recalc ? (Math.floor(t * 4) % 2 ? 'Recalculating…' : 'Recalculating') : t >= 4.5 ? 'Turn right: Product' : 'Continue: Engineering';
+    hudArrow.setAttribute('transform', t >= E.turn ? 'rotate(90 32 32)' : '');
+    hudSmall.textContent = recalc ? 'PLEASE WAIT' : t >= E.turn ? 'NOW' : 'IN 300 M';
+    hudBig.textContent = recalc ? (Math.floor(t * 4) % 2 ? 'Recalculating…' : 'Recalculating') : t >= E.turn ? 'Turn right: Product' : 'Continue: Engineering';
   };
 });
 
 // 6. Flight
-scene(48, 55, (g) => {
+scene(SC.flight.start, SC.flight.end, (g) => {
   el('rect', { width: 1280, height: 720, fill: grad([[0, '#1b2a4a'], [1, '#e08a5f']]) }, g);
   stars(g, 30, 9);
   el('path', { d: 'M0 640 Q640 560 1280 640 L1280 720 L0 720 Z', fill: '#1f2c48' }, g);
@@ -415,7 +437,7 @@ scene(48, 55, (g) => {
 });
 
 // 7. Duke: courses, Design Thinking, interviews, trust
-scene(55, 72.5, (g) => {
+scene(SC.duke.start, SC.duke.end, (g) => {
   el('rect', { width: 1280, height: 720, fill: grad([[0, '#08101f'], [1, '#18294a']]) }, g);
   stars(g, 120, 17);
   el('circle', { cx: 1110, cy: 110, r: 46, fill: '#f2f4ff', opacity: .9 }, g);
@@ -441,29 +463,29 @@ scene(55, 72.5, (g) => {
   return t => {
     av.blink(t % 3.3 > 3.15);
     courses.forEach(o => {
-      const p = back(prog(t, 2.6 + o.i * .3, 3.1 + o.i * .3));
-      const out = 1 - prog(t, 5.8, 6.2);
+      const p = back(prog(t, E.strategy + o.i * .3, E.strategy + .5 + o.i * .3));
+      const out = 1 - prog(t, E.design - .5, E.design - .1);
       set(o.c, { transform: `translate(${o.x} ${o.y + Math.sin(t * 1.6 + o.i) * 6}) scale(${Math.max(.01, p * out)})` });
     });
     // Design Thinking arrives last, then takes the stage
-    const dp = back(prog(t, 5.7, 6.2));
-    const mv = ease(prog(t, 6.3, 7.1));
+    const dp = back(prog(t, E.design - .2, E.design + .3));
+    const mv = ease(prog(t, E.design + .4, E.design + 1.2));
     set(design, { transform: `translate(${lerp(560, 640, mv)} ${lerp(330, 180, mv)}) scale(${Math.max(.01, dp) * lerp(1, 1.15, mv)})` });
-    design.setAttribute('opacity', 1 - prog(t, 9.5, 9.9));
+    design.setAttribute('opacity', 1 - prog(t, E.after - .4, E.after));
     bubbles.forEach(o => {
-      const p = back(prog(t, 9.9 + o.i * .45, 10.4 + o.i * .45));
-      const out = 1 - prog(t, 12.9, 13.3);
+      const p = back(prog(t, E.after + o.i * .45, E.after + .5 + o.i * .45));
+      const out = 1 - prog(t, E.people + .6, E.people + 1);
       set(o.b, { transform: `translate(${o.x} ${o.y + 120 + Math.sin(t * 2 + o.i) * 6}) scale(${Math.max(.01, p * out)})` });
     });
-    const n = Math.round(lerp(1, 15, prog(t, 9.9, 12.4)));
-    counter.textContent = t > 9.9 && t < 13.3 ? `INTERVIEWS: ${n}${n === 15 ? '+' : ''}` : '';
-    const tp = back(prog(t, 15.6, 16.2));
+    const n = Math.round(lerp(1, 15, prog(t, E.after, E.after + 2.5)));
+    counter.textContent = t > E.after && t < E.people + 1 ? `INTERVIEWS: ${n}${n === 15 ? '+' : ''}` : '';
+    const tp = back(prog(t, E.trust, E.trust + .6));
     set(trust, { transform: `translate(660 250) scale(${Math.max(.01, tp)})` });
   };
 });
 
 // 8. PointsMax
-scene(72.5, 83.5, (g) => {
+scene(SC.pointsmax.start, SC.pointsmax.end, (g) => {
   el('rect', { width: 1280, height: 720, fill: grad([[0, '#0f1a30'], [1, '#1f3a5a']]) }, g);
   stars(g, 50, 23);
   const lines = el('g', {}, g);
@@ -485,20 +507,20 @@ scene(72.5, 83.5, (g) => {
     av.blink(t % 2.9 > 2.75);
     cards.forEach(o => {
       const p = back(prog(t, .4 + o.i * .5, .9 + o.i * .5));
-      const jig = t < 8 ? Math.sin(t * 7 + o.i) * 6 : 0;
+      const jig = t < E.built ? Math.sin(t * 7 + o.i) * 6 : 0;
       set(o.c, { transform: `translate(${o.x + jig} ${o.y + Math.sin(t * 1.7 + o.i) * 8}) rotate(${(o.i - 1) * 6}) scale(${Math.max(.01, p)})` });
-      o.line.setAttribute('opacity', prog(t, 8 + o.i * .25, 8.4 + o.i * .25));
+      o.line.setAttribute('opacity', prog(t, E.built + o.i * .25, E.built + .4 + o.i * .25));
       o.line.setAttribute('stroke-dashoffset', -t * 30);
     });
-    const on = prog(t, 8.9, 9.3);
+    const on = prog(t, E.built + .6, E.built + 1);
     best.setAttribute('opacity', on); best2.setAttribute('opacity', on);
-    logo.setAttribute('opacity', prog(t, 9.4, 10));
-    set(logo, { y: 120 + (1 - ease(prog(t, 9.4, 10))) * 14 });
+    logo.setAttribute('opacity', prog(t, E.points, E.points + .6));
+    set(logo, { y: 120 + (1 - ease(prog(t, E.points, E.points + .6))) * 14 });
   };
 });
 
 // 9. Sunrise: your team?
-scene(83.5, 94.5, (g) => {
+scene(SC.finale.start, SC.finale.end, (g) => {
   el('rect', { width: 1280, height: 720, fill: grad([[0, '#2b4a7a'], [1, '#f6b27a']]) }, g);
   const sun = el('circle', { cx: 640, cy: 640, r: 150, fill: '#ffe2a0' }, g);
   el('rect', { y: 600, width: 1280, height: 120, fill: '#3b3a4f' }, g);
@@ -518,9 +540,9 @@ scene(83.5, 94.5, (g) => {
     const pop = back(prog(t, .3, 1));
     set(holder, { transform: `translate(400 ${545 + (1 - pop) * 60}) scale(${1.1 * Math.max(.01, pop)})` });
     av.wave(t, 1);
-    title.setAttribute('opacity', prog(t, 5.6, 6.4));
-    set(title, { y: 150 + (1 - ease(prog(t, 5.6, 6.4))) * 18 });
-    url.setAttribute('opacity', prog(t, 6.4, 7));
+    title.setAttribute('opacity', prog(t, E.maybe, E.maybe + .8));
+    set(title, { y: 150 + (1 - ease(prog(t, E.maybe, E.maybe + .8))) * 18 });
+    url.setAttribute('opacity', prog(t, E.maybe + .8, E.maybe + 1.4));
   };
 });
 
@@ -530,14 +552,14 @@ scene(83.5, 94.5, (g) => {
 // down to the map, a pan after the turning car, clouds on landing, a route
 // line, and an iris out of the phone.
 const TRANS = [
-  { at: 6.5, d: 1.1, type: 'iris', x: 640, y: 470 },
-  { at: 19, d: 1.5, type: 'carwipe' },
-  { at: 31, d: 1.1, type: 'zoom', x: 735, y: 330 },
-  { at: 40.5, d: 1.0, type: 'tilt' },
-  { at: 48, d: 1.0, type: 'push' },
-  { at: 55, d: 1.6, type: 'clouds' },
-  { at: 72.5, d: 1.1, type: 'band' },
-  { at: 83.5, d: 1.2, type: 'iris', x: 620, y: 540, ring: true },
+  { at: SC.delhi.start, d: 1.1, type: 'iris', x: 640, y: 470 },
+  { at: SC.drive.start, d: 1.5, type: 'carwipe' },
+  { at: SC.doubt.start, d: 1.1, type: 'zoom', x: 735, y: 330 },
+  { at: SC.recalc.start, d: 1.0, type: 'tilt' },
+  { at: SC.flight.start, d: 1.0, type: 'push' },
+  { at: SC.duke.start, d: 1.6, type: 'clouds' },
+  { at: SC.pointsmax.start, d: 1.1, type: 'band' },
+  { at: SC.finale.start, d: 1.2, type: 'iris', x: 620, y: 540, ring: true },
 ];
 scenes.forEach((s, i) => {
   const tin = TRANS.find(tr => tr.at === s.start), tout = TRANS.find(tr => tr.at === s.end);
@@ -609,39 +631,13 @@ el('rect', { width: 300, height: 60, rx: 12, fill: C.ink, opacity: .88 }, odo);
 el('text', { x: 18, y: 24, class: 'm', 'font-size': 12, 'letter-spacing': 3, fill: C.dim }, odo, 'ODOMETER');
 const odoVal = el('text', { x: 18, y: 48, class: 'm', 'font-size': 22, 'font-weight': 600, fill: C.paper }, odo, '');
 const odoPlace = el('text', { x: 282, y: 48, 'text-anchor': 'end', class: 'd', 'font-size': 17, 'font-weight': 800, fill: C.sodium }, odo, '');
-const ODO = [[6.5, 2016.6, 'NEW DELHI'], [19, 2020.8, 'BENGALURU'], [31, 2023.2, 'BENGALURU'], [40.5, 2025.3, 'BENGALURU'], [48, 2025.55, 'IN FLIGHT'], [55, 2025.65, 'DURHAM, NC'], [72.5, 2026.0, 'DURHAM, NC'], [83.5, 2026.9, 'DURHAM, NC'], [94.5, 2027.0, 'NEXT STOP']];
+const ODO = [[SC.delhi.start, 2016.6, 'NEW DELHI'], [SC.drive.start, 2020.8, 'BENGALURU'], [SC.doubt.start, 2023.2, 'BENGALURU'], [SC.recalc.start, 2025.3, 'BENGALURU'], [SC.flight.start, 2025.55, 'IN FLIGHT'], [SC.duke.start, 2025.65, 'DURHAM, NC'], [SC.pointsmax.start, 2026.0, 'DURHAM, NC'], [SC.finale.start, 2026.9, 'DURHAM, NC'], [TL.duration, 2027.0, 'NEXT STOP']];
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
 const capG = el('g', {});
 const capBg = el('rect', { rx: 14, fill: C.ink, opacity: .84 }, capG);
 const capText = el('text', { 'text-anchor': 'middle', class: 'd', 'font-size': 28, 'font-weight': 800, fill: C.paper }, capG);
-const CAPTIONS = [
-  [0.85, 2.25, "Hey, I'm Aditya."],
-  [2.25, 4.25, "Let me tell you how I got here."],
-  [7.05, 11.79, "I was always the analytical kid.|Math, science, building fun stuff."],
-  [11.79, 13.16, "So: engineering."],
-  [13.16, 17.18, "But I also loved investing,|and how money moves the world."],
-  [17.18, 19.10, "So I added economics."],
-  [19.55, 25.36, "Then, five years at HARMAN in Bengaluru,|building navigation for cars and trucks."],
-  [25.36, 31.43, "When a truck's camera can't see a speed sign,|our map data still knows it."],
-  [31.55, 33.70, "But I kept having business doubts."],
-  [33.70, 36.33, "As an engineer, you get tasks, not a vote."],
-  [36.33, 40.69, "A lot of effort went into things|that just didn't make business sense."],
-  [40.95, 44.66, "I wanted to help decide what gets built,|not just how."],
-  [44.66, 46.60, "So: I recalculated."],
-  [48.65, 51.78, "In 2025, I moved to the US."],
-  [51.78, 55.43, "It's where AI is being built,|and I wanted to be there."],
-  [55.75, 60.44, "At Duke, I picked up the business side:|strategy, finance, marketing."],
-  [60.95, 64.86, "Design Thinking taught me|how to really interview customers."],
-  [64.86, 68.24, "After 15+ interviews, the lesson was simple."],
-  [68.24, 71.74, "People weren't missing information.|They were missing trust."],
-  [72.95, 76.71, "On the side, I'm a little obsessed|with credit card points."],
-  [76.71, 81.38, "I was optimizing everything by hand,|and couldn't find a tool that did it."],
-  [81.38, 83.74, "So I built one: PointsMax."],
-  [84.45, 85.63, "Next stop?"],
-  [85.63, 89.46, "A team that moves fast, has fun,|and makes a real dent."],
-  [89.55, 90.92, "Maybe yours."],
-];
+const CAPTIONS = TL.captions.map(c => [c.start, c.end, c.caption]);
 
 function render(t) {
   overlay.querySelectorAll(':scope > *').forEach(n => n.setAttribute('display', 'none'));
@@ -661,7 +657,7 @@ function render(t) {
     if (t >= a && t < tr.at + tr.d / 2) applyTransition(tr, (t - a) / tr.d, scenes[i], scenes[i + 1]);
   });
 
-  odo.setAttribute('opacity', prog(t, 6.9, 7.5) * (1 - prog(t, 90.5, 91.5)));
+  odo.setAttribute('opacity', prog(t, 6.9, 7.5) * (1 - prog(t, TL.duration - 4, TL.duration - 3)));
   let k = ODO.findIndex(o => t < o[0]);
   if (k < 1) k = 1;
   const [t0, y0, p0] = ODO[k - 1], [t1, y1] = ODO[k];
@@ -683,7 +679,7 @@ function render(t) {
   set(capG, { transform: `translate(0 ${(1 - a) * 10})` });
 }
 window.render = render;
-window.DURATION = 94.5;
+window.DURATION = TL.duration;
 render(0);
 </script>
 </body></html>

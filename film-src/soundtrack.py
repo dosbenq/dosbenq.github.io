@@ -2,14 +2,21 @@
 
 Everything is synthesised here (no samples), so the track is free to use.
 Run:  python3 film-src/soundtrack.py out.wav [voice.wav]
-Times below match the scene and transition times in film.html.
+Scene times and sync beats come from timeline.json (written by
+voiceover_recorded.py), the same file film.html reads.
 """
 import sys
 import numpy as np
 from scipy import signal
 
+import json
+import os
+
+TL = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'timeline.json')))
+SC = {s['name']: s for s in TL['scenes']}
+BT = TL['beats']
 SR = 44100
-DUR = 94.5
+DUR = TL['duration']
 N = int(SR * DUR)
 rng = np.random.default_rng(7)
 
@@ -105,13 +112,13 @@ def kick(vel=1.0):
     t = t_axis(.45)
     f = 45 + 80 * np.exp(-t * 28)
     x = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 9)
-    return x * vel * .55
+    return x * vel * .42
 
 
 def clap(vel=1.0):
     t = t_axis(.25)
     x = bp(rng.standard_normal(len(t)), 900, 5000) * np.exp(-t * 22)
-    return x * vel * .22
+    return x * vel * .16
 
 
 def hat(vel=1.0, dur=.06):
@@ -192,18 +199,33 @@ CH = {
 ROOT = {'D': 'D2', 'Bm': 'B1', 'G': 'G1', 'A': 'A1', 'Em': 'E2', 'F#': 'F#1', 'Asus': 'A1', 'Dadd9': 'D2'}
 BEAT = 60 / 96
 
-# (start, chord, length, section)
-PROG = [
-    (0.0, 'Dadd9', 6.5, 'title'),
-    (6.5, 'D', 2.5, 'delhi'), (9.0, 'Bm', 2.5, 'delhi'), (11.5, 'G', 2.5, 'delhi'), (14.0, 'A', 2.5, 'delhi'), (16.5, 'D', 2.5, 'delhi'),
-    (19.0, 'D', 2.5, 'drive'), (21.5, 'A', 2.5, 'drive'), (24.0, 'Bm', 2.5, 'drive'), (26.5, 'G', 2.5, 'drive'), (29.0, 'A', 2.0, 'drive'),
-    (31.0, 'Bm', 2.5, 'doubt'), (33.5, 'G', 2.5, 'doubt'), (36.0, 'Em', 2.5, 'doubt'), (38.5, 'F#', 2.0, 'doubt'),
-    (40.5, 'Em', 3.1, 'recalc'), (43.6, 'Asus', 1.4, 'recalc'), (45.0, 'D', 1.5, 'lift'), (46.5, 'G', 1.5, 'lift'),
-    (48.0, 'G', 2.5, 'flight'), (50.5, 'D', 2.5, 'flight'), (53.0, 'A', 2.0, 'flight'),
-    (55.0, 'Bm', 2.5, 'duke'), (57.5, 'G', 2.5, 'duke'), (60.0, 'D', 2.5, 'duke'), (62.5, 'A', 2.5, 'duke'), (65.0, 'Bm', 2.5, 'duke'), (67.5, 'G', 2.5, 'duke'), (70.0, 'D', 2.5, 'duke'),
-    (72.5, 'D', 2.5, 'groove'), (75.0, 'A', 2.5, 'groove'), (77.5, 'Bm', 2.5, 'groove'), (80.0, 'G', 2.5, 'groove'), (82.5, 'A', 1.0, 'groove'),
-    (83.5, 'D', 2.5, 'finale'), (86.0, 'A', 2.5, 'finale'), (88.5, 'Bm', 2.5, 'finale'), (91.0, 'G', 2.0, 'finale'), (93.0, 'D', 1.5, 'end'),
-]
+# chords per scene, laid out in 2.5 s bars and trimmed to each scene
+SECTION = {'title': ('title', ['Dadd9']), 'delhi': ('delhi', ['D', 'Bm', 'G', 'A']),
+           'drive': ('drive', ['D', 'A', 'Bm', 'G']), 'doubt': ('doubt', ['Bm', 'G', 'Em', 'F#']),
+           'flight': ('flight', ['G', 'D', 'A']), 'duke': ('duke', ['Bm', 'G', 'D', 'A']),
+           'pointsmax': ('groove', ['D', 'A', 'Bm', 'G']), 'finale': ('finale', ['D', 'A', 'Bm', 'G'])}
+RECALC = BT['notJustHow'] + .9   # matches the film's "Recalculating" moment
+TURN = BT['turn']
+PROG = []
+for sc in TL['scenes']:
+    a, b = sc['start'], sc['end']
+    if sc['name'] == 'recalc':
+        PROG += [(a, 'Em', RECALC - a, 'recalc'), (RECALC, 'Asus', TURN - RECALC, 'recalc'),
+                 (TURN, 'D', 1.5, 'lift'), (TURN + 1.5, 'G', b - TURN - 1.5, 'lift')]
+        continue
+    style, chords = SECTION[sc['name']]
+    if style == 'title':
+        PROG.append((a, chords[0], b - a, style))
+        continue
+    end = b - 1.5 if style == 'finale' else b
+    t, k = a, 0
+    while t < end - .05:
+        length = 2.5 if end - t - 2.5 >= 1.0 else end - t
+        PROG.append((t, chords[k % len(chords)], length, style))
+        t += length
+        k += 1
+    if style == 'finale':
+        PROG.append((end, 'D', 1.5, 'end'))
 
 for start, ch, length, sec in PROG:
     notes = [hz(n) for n in CH[ch]]
@@ -265,59 +287,76 @@ for i, n in enumerate(MOTIF):
     place(music, pluck(hz(n), .9, 1.1), 2.0 + i * BEAT / 2 * 1.5, pan=.2)
 FINALE = ['F#5', 'A5', 'D6', 'C#6', 'A5', 'B5', 'A5', 'F#5', 'D5', 'E5', 'F#5', 'A5', 'B5', 'A5', 'F#5', 'E5']
 for i, n in enumerate(FINALE):
-    place(music, pluck(hz(n), 1.0, .85), 83.5 + i * BEAT, pan=.15)
-place(music, pluck(hz('D6'), 2.4, .9), 83.5 + 16 * BEAT + .1, pan=.15)
+    if i < 8:  # the first half answers the narration softly, the rest plays after it
+        place(music, pluck(hz(n), 1.0, .4), SC['finale']['start'] + i * BEAT, pan=.15)
+for i, n in enumerate(FINALE[8:]):
+    place(music, pluck(hz(n), 1.0, .9), BT['maybe'] + .75 + i * BEAT * .75, pan=.15)
+place(music, pluck(hz('D6'), 2.4, .9), BT['maybe'] + .75 + 8 * BEAT * .75 + .1, pan=.15)
 GROOVE = ['D5', 'F#5', 'A5', 'F#5', 'E5', 'C#5', 'E5', 'A5', 'F#5', 'D5', 'B4', 'D5', 'G5', 'D5', 'B4', 'G4']
 for i, n in enumerate(GROOVE):
-    place(music, pluck(hz(n), .7, .45), 72.5 + i * BEAT * .9, pan=-.15)
+    place(music, pluck(hz(n), .7, .45), SC['pointsmax']['start'] + i * BEAT * .9, pan=-.15)
 
 # ---------------- sound effects ----------------
+def boundary(name):
+    return SC[name]['start']
+
+
 place(sfx, pop(.8, 500), 0.85)
 for i in range(4):
-    place(sfx, pop(.6, 700 + 80 * i), 6.5 + .8 + .25 * i, pan=-.5)
-    place(sfx, pop(.6, 900 + 80 * i), 6.5 + 6.5 + .25 * i, pan=.5)
-place(sfx, whoosh(1.1, 400, 7000, True, .8), 5.95)                      # iris
-place(sfx, engine_pass(1.6, 1.0), 18.2)                                 # car wipe
-place(sfx, road_hum(12.0, 1.0), 19.0)
-place(sfx, glitch(1.0), 26.8)                                           # camera goes blind
-for at in (26.8, 27.57):
-    place(sfx, bell(hz('E6'), .6, .35), at, pan=.3)
-place(sfx, whoosh(1.1, 2000, 300, False, .7), 30.45)                    # into the window
+    place(sfx, pop(.6, 700 + 80 * i), boundary('delhi') + .8 + .25 * i, pan=-.5)
+    place(sfx, pop(.6, 900 + 80 * i), BT['delhiEcon'] - .2 + .25 * i, pan=.5)
+place(sfx, whoosh(1.1, 400, 7000, True, .8), boundary('delhi') - .55)               # iris
+place(sfx, engine_pass(1.6, 1.0), boundary('drive') - .8)                            # car wipe
+place(sfx, road_hum(SC['drive']['end'] - boundary('drive'), .55), boundary('drive'))
+blind = BT['camera'] - .2
+place(sfx, glitch(1.0), blind)                                                       # camera goes blind
+pings = set()
+for i in range(9):                                                                   # a ping as each sign is read from the map
+    local_blind = blind - boundary('drive')
+    shows = local_blind - 5.8 + (1700 + 380 * i) / 420
+    gone = local_blind - 5.8 + (2700 + 380 * i) / 420
+    t_ping = max(local_blind, shows)
+    if t_ping < gone and boundary('drive') + t_ping < SC['drive']['end']:
+        pings.add(round(boundary('drive') + t_ping, 2))
+for at in sorted(pings):
+    place(sfx, bell(hz('E6'), .6, .22), at, pan=.3)
+place(sfx, whoosh(1.1, 2000, 300, False, .7), boundary('doubt') - .55)              # into the window
 for i in range(7):
-    place(sfx, pop(.55, 260 - 10 * i), 33.9 + .5 * i, pan=.4)           # tickets landing
-place(sfx, pop(.7, 900), 36.6)
-place(sfx, whoosh(1.0, 3000, 400, False, .7), 40.0)                     # tilt down
-place(sfx, bell(hz('A5'), 1.2, .6), 43.6)                               # recalculating
-t = 43.8
-while t < 45.8:
+    place(sfx, pop(.55, 260 - 10 * i), BT['tasks'] + .2 + .5 * i, pan=.4)            # tickets landing
+place(sfx, pop(.7, 900), BT['bizSense'])
+place(sfx, whoosh(1.0, 3000, 400, False, .7), boundary('recalc') - .5)              # tilt down
+place(sfx, bell(hz('A5'), 1.2, .6), RECALC)                                          # recalculating
+t = RECALC + .2
+while t < TURN + .8:
     place(sfx, tick(.8, 1500), t, pan=.25)
     place(sfx, tick(.6, 1200), t + .2, pan=.25)
     t += .4
-place(sfx, bell(hz('D6'), 1.6, .7), 45.0)
-place(sfx, bell(hz('F#6'), 1.4, .5), 45.15)
-place(sfx, whoosh(1.0, 500, 5000, True, .7), 47.5)                      # push
-place(sfx, whoosh(5.8, 200, 1400, True, .9), 48.5)                      # jet
-place(sfx, whoosh(1.6, 200, 2500, True, 1.0), 54.2)                     # clouds
+place(sfx, bell(hz('D6'), 1.6, .7), TURN)
+place(sfx, bell(hz('F#6'), 1.4, .5), TURN + .15)
+place(sfx, whoosh(1.0, 500, 5000, True, .7), boundary('flight') - .5)               # push
+place(sfx, whoosh(5.8, 200, 1400, True, .9), boundary('flight') + .5)               # jet
+place(sfx, whoosh(1.6, 200, 2500, True, 1.0), boundary('duke') - .8)                # clouds
 for i in range(5):
-    place(sfx, pop(.45, 1100 + 90 * i), 57.6 + .3 * i, pan=-.4 + .2 * i)
-place(sfx, bell(hz('B5'), 1.0, .55), 60.7)
+    place(sfx, pop(.45, 1100 + 90 * i), BT['strategy'] - .2 + .3 * i, pan=-.4 + .2 * i)
+place(sfx, bell(hz('B5'), 1.0, .55), BT['design'])
 for i in range(3):
-    place(sfx, pop(.5, 700), 64.9 + .45 * i, pan=-.3 + .3 * i)
+    place(sfx, pop(.5, 700), BT['after'] + .45 * i, pan=-.3 + .3 * i)
 for i in range(14):
-    place(sfx, tick(.35, 2200), 64.9 + i * (2.5 / 14))
-place(sfx, bell(hz('D6'), 2.4, .9), 70.6)                               # TRUST
-place(sfx, bell(hz('A6'), 2.0, .4), 70.65)
-place(sfx, whoosh(1.1, 500, 6000, True, .7), 71.95)                     # route band
+    place(sfx, tick(.35, 2200), BT['after'] + i * (2.5 / 14))
+place(sfx, bell(hz('D6'), 2.4, .9), BT['trust'] - .15)                              # TRUST
+place(sfx, bell(hz('A6'), 2.0, .4), BT['trust'] - .1)
+place(sfx, whoosh(1.1, 500, 6000, True, .7), boundary('pointsmax') - .55)           # route band
 for i in range(3):
-    place(sfx, pop(.6, 500 + 120 * i), 72.9 + .5 * i, pan=-.5 + .5 * i)
-place(sfx, whoosh(1.2, 600, 4000, True, .5), 80.5)
-place(sfx, bell(hz('E6'), 1.2, .6), 81.4)
-place(sfx, kick(.9), 81.9)
-place(sfx, whoosh(1.3, 300, 8000, True, .8), 82.9)                      # iris out of the phone
-place(sfx, pop(.7, 520), 83.8)
-place(sfx, kick(1.0), 89.1)
-place(sfx, bell(hz('D6'), 3.0, .8), 89.1)
-place(sfx, bell(hz('A5'), 3.0, .5), 89.12)
+    place(sfx, pop(.6, 500 + 120 * i), boundary('pointsmax') + .4 + .5 * i, pan=-.5 + .5 * i)
+place(sfx, whoosh(1.2, 600, 4000, True, .5), BT['builtOne'])
+place(sfx, bell(hz('E6'), 1.2, .6), BT['builtOne'] + .6)
+place(sfx, kick(.9), BT['points'])
+place(sfx, whoosh(1.3, 300, 8000, True, .8), boundary('finale') - 1.0)              # iris out of the phone
+place(sfx, pop(.5, 520), boundary('finale') + .3)
+END_HIT = BT['maybe'] + .75                                                         # right after "Maybe yours"
+place(sfx, kick(1.0), END_HIT)
+place(sfx, bell(hz('D6'), 3.0, .8), END_HIT)
+place(sfx, bell(hz('A5'), 3.0, .5), END_HIT + .02)
 
 # ---------------- mix ----------------
 def reverb(x, secs=2.2, wet=.22):
@@ -350,12 +389,14 @@ if len(sys.argv) > 2:
     since = (np.arange(N) - hold) / SR
     duck = np.clip(1 - since / .45, 0, 1) * (hold > 0)
     duck = signal.sosfilt(signal.butter(1, 6, 'low', fs=SR, output='sos'), duck)
-    music *= (1 - .86 * duck)[:, None]
-    sfx *= (1 - .55 * duck)[:, None]
+    lead = int(.08 * SR)  # start ducking just before each line
+    duck = np.concatenate([duck[lead:], np.zeros(lead)])
+    music *= (1 - .93 * duck)[:, None]
+    sfx *= (1 - .7 * duck)[:, None]
     v2 = np.stack([voice, voice], axis=1)
     voice = reverb(v2, .6, .06)
 
-mix = music * .9 + sfx * 1.0
+mix = music * .55 + sfx * 1.0
 if voice is not None:
     import os
     if os.environ.get('STEMS'):
