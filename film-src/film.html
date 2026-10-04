@@ -201,7 +201,7 @@ scene(0, 6.5, (g) => {
 });
 
 // 2. Delhi: engineering and economics
-scene(6.5, 16, (g) => {
+scene(6.5, 19, (g) => {
   el('rect', { width: 1280, height: 720, fill: grad([[0, '#f39f6a'], [1, '#ffe6c4']]) }, g);
   el('circle', { cx: 1040, cy: 470, r: 120, fill: '#fff0c8', opacity: .8 }, g);
   const city = el('g', { fill: '#c0705a' }, g);
@@ -232,16 +232,16 @@ scene(6.5, 16, (g) => {
       set(o.c, { transform: `translate(${o.x} ${o.y + Math.sin(t * 2 + i) * 8}) scale(${Math.max(.01, p)})` });
     });
     right.forEach((o, i) => {
-      const p = back(prog(t, 4.8 + i * .25, 5.3 + i * .25));
+      const p = back(prog(t, 6.5 + i * .25, 7 + i * .25));
       set(o.c, { transform: `translate(${o.x} ${o.y + Math.sin(t * 2 + i + 1) * 8}) scale(${Math.max(.01, p)})` });
     });
     lt.setAttribute('opacity', prog(t, .8, 1.4));
-    rt.setAttribute('opacity', prog(t, 4.8, 5.4));
+    rt.setAttribute('opacity', prog(t, 6.5, 7.1));
   };
 });
 
 // 3. Bengaluru: HARMAN, signs from the map
-scene(16, 28, (g) => {
+scene(19, 31, (g) => {
   el('rect', { width: 1280, height: 720, fill: grad([[0, '#3f86d6'], [1, '#c6e6ff']]) }, g);
   el('circle', { cx: 1080, cy: 150, r: 70, fill: '#fff3c4', opacity: .9 }, g);
   const sky = el('g', {}, g);
@@ -279,7 +279,7 @@ scene(16, 28, (g) => {
     // the car arrives with the wipe, so it is already in place from the start
     set(car.g, { transform: `translate(430 ${612 + Math.sin(t * 18) * 1.5})`, display: t >= .75 ? 'inline' : 'none' });
     car.spin(speed * 2);
-    const blind = t > 5.8;
+    const blind = t > 7.8;
     camDot.setAttribute('fill', blind ? C.signal : C.go);
     camTxt.textContent = blind ? 'CAMERA BLIND' : 'CAMERA ON';
     signs.forEach(o => {
@@ -291,7 +291,7 @@ scene(16, 28, (g) => {
 });
 
 // 4. The doubt
-scene(28, 36.5, (g) => {
+scene(31, 40.5, (g) => {
   el('rect', { width: 1280, height: 720, fill: '#e3e9f1' }, g);
   el('rect', { x: 820, y: 90, width: 360, height: 300, rx: 8, fill: '#9cc6ee' }, g);
   for (let i = 0; i < 5; i++) el('rect', { x: 840 + i * 68, y: 390 - (90 + i * 37 % 120), width: 52, height: 90 + i * 37 % 120, fill: '#5d79a8' }, g);
@@ -316,17 +316,17 @@ scene(28, 36.5, (g) => {
   return t => {
     av.blink(t % 2.7 > 2.55);
     tickets.forEach((tk, i) => {
-      const p = ease(prog(t, .5 + i * .55, 1 + i * .55));
+      const p = ease(prog(t, 2.4 + i * .5, 2.9 + i * .5));
       set(tk, { transform: `translate(${900 - (i % 2) * 14} ${lerp(-60, 540 - i * 34, p)}) rotate(${(i % 3 - 1) * 3})` });
     });
-    const b = back(prog(t, 3.2, 3.8));
-    bubble.setAttribute('opacity', prog(t, 3.2, 3.5));
+    const b = back(prog(t, 5.6, 6.2));
+    bubble.setAttribute('opacity', prog(t, 5.6, 5.9));
     set(bubble, { transform: `translate(700 300) scale(${Math.max(.01, b)}) translate(-700 -300)` });
   };
 });
 
 // 5. Road closed, recalculating (top-down map)
-scene(36.5, 44, (g) => {
+scene(40.5, 48, (g) => {
   el('rect', { width: 1280, height: 720, fill: '#141c33' }, g);
   const streets = el('g', { stroke: '#26314f', 'stroke-width': 26 }, g);
   [200, 520, 840, 1160].forEach(x => el('line', { x1: x, y1: 0, x2: x, y2: 720 }, streets));
@@ -358,30 +358,30 @@ scene(36.5, 44, (g) => {
   oldRoute.setAttribute('stroke-dasharray', '390 390');
   return t => {
     let x = 520, y, rot = 0;
-    const up = ease(prog(t, 0, 2.2));
-    if (t < 3.8) y = lerp(760, 380, up);
+    const up = ease(prog(t, 0, 3));
+    if (t < 4.6) y = lerp(760, 380, up);
     else {
-      const turn = ease(prog(t, 3.8, 4.6));
-      const go = ease(prog(t, 4.6, 7));
+      const turn = ease(prog(t, 4.6, 5.3));
+      const go = ease(prog(t, 5.3, 7.4));
       y = lerp(380, 360, turn); rot = 90 * turn; x = 520 + go * 820;
     }
     set(car, { transform: `translate(${x} ${y}) rotate(${rot})` });
-    blinker.setAttribute('opacity', t > 2.4 && t < 4.6 && Math.floor(t * 2.5) % 2 ? 1 : 0);
+    blinker.setAttribute('opacity', t > 3.3 && t < 5.3 && Math.floor(t * 2.5) % 2 ? 1 : 0);
     oldRoute.setAttribute('stroke-dashoffset', 390 - 390 * up);
-    oldRoute.setAttribute('opacity', t < 3.4 ? 1 : 0.15);
-    const nr = ease(prog(t, 3.2, 4.4));
+    oldRoute.setAttribute('opacity', t < 4.3 ? 1 : 0.15);
+    const nr = ease(prog(t, 4.1, 5.2));
     newRoute.setAttribute('stroke-dashoffset', pathLen - 1140 * nr);
-    newRoute.setAttribute('opacity', t > 3.2 ? 1 : 0);
-    const recalc = t > 2.2 && t < 3.6;
+    newRoute.setAttribute('opacity', t > 4.1 ? 1 : 0);
+    const recalc = t > 3.1 && t < 4.5;
     arrowBox.setAttribute('fill', recalc ? C.signal : C.sodium);
-    hudArrow.setAttribute('transform', t >= 3.6 ? 'rotate(90 32 32)' : '');
-    hudSmall.textContent = recalc ? 'PLEASE WAIT' : t >= 3.6 ? 'NOW' : 'IN 300 M';
-    hudBig.textContent = recalc ? (Math.floor(t * 4) % 2 ? 'Recalculating…' : 'Recalculating') : t >= 3.6 ? 'Turn right: Product' : 'Continue: Engineering';
+    hudArrow.setAttribute('transform', t >= 4.5 ? 'rotate(90 32 32)' : '');
+    hudSmall.textContent = recalc ? 'PLEASE WAIT' : t >= 4.5 ? 'NOW' : 'IN 300 M';
+    hudBig.textContent = recalc ? (Math.floor(t * 4) % 2 ? 'Recalculating…' : 'Recalculating') : t >= 4.5 ? 'Turn right: Product' : 'Continue: Engineering';
   };
 });
 
 // 6. Flight
-scene(44, 51, (g) => {
+scene(48, 55, (g) => {
   el('rect', { width: 1280, height: 720, fill: grad([[0, '#1b2a4a'], [1, '#e08a5f']]) }, g);
   stars(g, 30, 9);
   el('path', { d: 'M0 640 Q640 560 1280 640 L1280 720 L0 720 Z', fill: '#1f2c48' }, g);
@@ -415,7 +415,7 @@ scene(44, 51, (g) => {
 });
 
 // 7. Duke: courses, Design Thinking, interviews, trust
-scene(51, 65, (g) => {
+scene(55, 72.5, (g) => {
   el('rect', { width: 1280, height: 720, fill: grad([[0, '#08101f'], [1, '#18294a']]) }, g);
   stars(g, 120, 17);
   el('circle', { cx: 1110, cy: 110, r: 46, fill: '#f2f4ff', opacity: .9 }, g);
@@ -441,29 +441,29 @@ scene(51, 65, (g) => {
   return t => {
     av.blink(t % 3.3 > 3.15);
     courses.forEach(o => {
-      const p = back(prog(t, 4.6 + o.i * .3, 5.1 + o.i * .3));
-      const out = 1 - prog(t, 8.1, 8.5);
+      const p = back(prog(t, 2.6 + o.i * .3, 3.1 + o.i * .3));
+      const out = 1 - prog(t, 5.8, 6.2);
       set(o.c, { transform: `translate(${o.x} ${o.y + Math.sin(t * 1.6 + o.i) * 6}) scale(${Math.max(.01, p * out)})` });
     });
     // Design Thinking arrives last, then takes the stage
-    const dp = back(prog(t, 7.0, 7.5));
-    const mv = ease(prog(t, 8.2, 9));
+    const dp = back(prog(t, 5.7, 6.2));
+    const mv = ease(prog(t, 6.3, 7.1));
     set(design, { transform: `translate(${lerp(560, 640, mv)} ${lerp(330, 180, mv)}) scale(${Math.max(.01, dp) * lerp(1, 1.15, mv)})` });
-    design.setAttribute('opacity', 1 - prog(t, 11.2, 11.6));
+    design.setAttribute('opacity', 1 - prog(t, 9.5, 9.9));
     bubbles.forEach(o => {
-      const p = back(prog(t, 9 + o.i * .45, 9.5 + o.i * .45));
-      const out = 1 - prog(t, 11.2, 11.6);
+      const p = back(prog(t, 9.9 + o.i * .45, 10.4 + o.i * .45));
+      const out = 1 - prog(t, 12.9, 13.3);
       set(o.b, { transform: `translate(${o.x} ${o.y + 120 + Math.sin(t * 2 + o.i) * 6}) scale(${Math.max(.01, p * out)})` });
     });
-    const n = Math.round(lerp(1, 15, prog(t, 9, 11)));
-    counter.textContent = t > 9 && t < 11.6 ? `INTERVIEWS: ${n}${n === 15 ? '+' : ''}` : '';
-    const tp = back(prog(t, 11.6, 12.2));
+    const n = Math.round(lerp(1, 15, prog(t, 9.9, 12.4)));
+    counter.textContent = t > 9.9 && t < 13.3 ? `INTERVIEWS: ${n}${n === 15 ? '+' : ''}` : '';
+    const tp = back(prog(t, 15.6, 16.2));
     set(trust, { transform: `translate(660 250) scale(${Math.max(.01, tp)})` });
   };
 });
 
 // 8. PointsMax
-scene(65, 74, (g) => {
+scene(72.5, 83.5, (g) => {
   el('rect', { width: 1280, height: 720, fill: grad([[0, '#0f1a30'], [1, '#1f3a5a']]) }, g);
   stars(g, 50, 23);
   const lines = el('g', {}, g);
@@ -485,20 +485,20 @@ scene(65, 74, (g) => {
     av.blink(t % 2.9 > 2.75);
     cards.forEach(o => {
       const p = back(prog(t, .4 + o.i * .5, .9 + o.i * .5));
-      const jig = t < 4.4 ? Math.sin(t * 7 + o.i) * 6 : 0;
+      const jig = t < 8 ? Math.sin(t * 7 + o.i) * 6 : 0;
       set(o.c, { transform: `translate(${o.x + jig} ${o.y + Math.sin(t * 1.7 + o.i) * 8}) rotate(${(o.i - 1) * 6}) scale(${Math.max(.01, p)})` });
-      o.line.setAttribute('opacity', prog(t, 4.8 + o.i * .25, 5.2 + o.i * .25));
+      o.line.setAttribute('opacity', prog(t, 8 + o.i * .25, 8.4 + o.i * .25));
       o.line.setAttribute('stroke-dashoffset', -t * 30);
     });
-    const on = prog(t, 5.8, 6.2);
+    const on = prog(t, 8.9, 9.3);
     best.setAttribute('opacity', on); best2.setAttribute('opacity', on);
-    logo.setAttribute('opacity', prog(t, 6, 6.6));
-    set(logo, { y: 120 + (1 - ease(prog(t, 6, 6.6))) * 14 });
+    logo.setAttribute('opacity', prog(t, 9.4, 10));
+    set(logo, { y: 120 + (1 - ease(prog(t, 9.4, 10))) * 14 });
   };
 });
 
 // 9. Sunrise: your team?
-scene(74, 85, (g) => {
+scene(83.5, 94.5, (g) => {
   el('rect', { width: 1280, height: 720, fill: grad([[0, '#2b4a7a'], [1, '#f6b27a']]) }, g);
   const sun = el('circle', { cx: 640, cy: 640, r: 150, fill: '#ffe2a0' }, g);
   el('rect', { y: 600, width: 1280, height: 120, fill: '#3b3a4f' }, g);
@@ -518,9 +518,9 @@ scene(74, 85, (g) => {
     const pop = back(prog(t, .3, 1));
     set(holder, { transform: `translate(400 ${545 + (1 - pop) * 60}) scale(${1.1 * Math.max(.01, pop)})` });
     av.wave(t, 1);
-    title.setAttribute('opacity', prog(t, 4.8, 5.6));
-    set(title, { y: 150 + (1 - ease(prog(t, 4.8, 5.6))) * 18 });
-    url.setAttribute('opacity', prog(t, 5.6, 6.2));
+    title.setAttribute('opacity', prog(t, 5.6, 6.4));
+    set(title, { y: 150 + (1 - ease(prog(t, 5.6, 6.4))) * 18 });
+    url.setAttribute('opacity', prog(t, 6.4, 7));
   };
 });
 
@@ -531,13 +531,13 @@ scene(74, 85, (g) => {
 // line, and an iris out of the phone.
 const TRANS = [
   { at: 6.5, d: 1.1, type: 'iris', x: 640, y: 470 },
-  { at: 16, d: 1.5, type: 'carwipe' },
-  { at: 28, d: 1.1, type: 'zoom', x: 735, y: 330 },
-  { at: 36.5, d: 1.0, type: 'tilt' },
-  { at: 44, d: 1.0, type: 'push' },
-  { at: 51, d: 1.6, type: 'clouds' },
-  { at: 65, d: 1.1, type: 'band' },
-  { at: 74, d: 1.2, type: 'iris', x: 620, y: 540, ring: true },
+  { at: 19, d: 1.5, type: 'carwipe' },
+  { at: 31, d: 1.1, type: 'zoom', x: 735, y: 330 },
+  { at: 40.5, d: 1.0, type: 'tilt' },
+  { at: 48, d: 1.0, type: 'push' },
+  { at: 55, d: 1.6, type: 'clouds' },
+  { at: 72.5, d: 1.1, type: 'band' },
+  { at: 83.5, d: 1.2, type: 'iris', x: 620, y: 540, ring: true },
 ];
 scenes.forEach((s, i) => {
   const tin = TRANS.find(tr => tr.at === s.start), tout = TRANS.find(tr => tr.at === s.end);
@@ -609,30 +609,38 @@ el('rect', { width: 300, height: 60, rx: 12, fill: C.ink, opacity: .88 }, odo);
 el('text', { x: 18, y: 24, class: 'm', 'font-size': 12, 'letter-spacing': 3, fill: C.dim }, odo, 'ODOMETER');
 const odoVal = el('text', { x: 18, y: 48, class: 'm', 'font-size': 22, 'font-weight': 600, fill: C.paper }, odo, '');
 const odoPlace = el('text', { x: 282, y: 48, 'text-anchor': 'end', class: 'd', 'font-size': 17, 'font-weight': 800, fill: C.sodium }, odo, '');
-const ODO = [[6.5, 2016.6, 'NEW DELHI'], [16, 2020.8, 'BENGALURU'], [28, 2023.2, 'BENGALURU'], [36.5, 2025.3, 'BENGALURU'], [44, 2025.55, 'IN FLIGHT'], [51, 2025.65, 'DURHAM, NC'], [65, 2026.0, 'DURHAM, NC'], [74, 2026.9, 'DURHAM, NC'], [85, 2027.0, 'NEXT STOP']];
+const ODO = [[6.5, 2016.6, 'NEW DELHI'], [19, 2020.8, 'BENGALURU'], [31, 2023.2, 'BENGALURU'], [40.5, 2025.3, 'BENGALURU'], [48, 2025.55, 'IN FLIGHT'], [55, 2025.65, 'DURHAM, NC'], [72.5, 2026.0, 'DURHAM, NC'], [83.5, 2026.9, 'DURHAM, NC'], [94.5, 2027.0, 'NEXT STOP']];
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
 const capG = el('g', {});
 const capBg = el('rect', { rx: 14, fill: C.ink, opacity: .84 }, capG);
 const capText = el('text', { 'text-anchor': 'middle', class: 'd', 'font-size': 28, 'font-weight': 800, fill: C.paper }, capG);
 const CAPTIONS = [
-  [2.6, 6.2, "Hi, I'm Aditya. This is how I got here."],
-  [7.2, 11.4, 'Delhi, 2016. I was always the analytical kid:|math, science, and building fun things with them.'],
-  [11.6, 15.6, 'But I loved the business side too:|investing, and how money moves the world.'],
-  [16.8, 21.8, 'Bengaluru, 2020. Five years at HARMAN,|teaching cars and trucks to read the road.'],
-  [22.2, 27.6, 'When the camera went blind,|my map data kept the speed signs coming.'],
-  [28.6, 32.4, 'But I kept having business doubts.|Engineers get tasks, not a vote.'],
-  [32.6, 36.0, "Too much effort went into things|that didn't make business sense."],
-  [37.0, 40.4, 'I wanted to help decide what gets built,|not only how.'],
-  [40.6, 43.6, 'So: recalculating. Engineering → Product.'],
-  [44.6, 50.6, "2025. The US is at the forefront of AI,|and I wanted to be where it's being built."],
-  [51.8, 55.4, 'Duke. Engineering management:|business skills, pointed at high tech.'],
-  [55.6, 59.0, 'Strategy, finance and marketing gave me|the business lens I had been missing.'],
-  [59.2, 62.2, 'Design Thinking taught me how to run|real customer interviews.'],
-  [62.4, 64.6, 'After 15+ of them, the barrier was clear:|trust, not information.'],
-  [65.6, 69.8, 'My side passion: credit card points.|Loyalty is skewed, and I was optimizing it all by hand.'],
-  [70.0, 73.6, 'No tool did it for me.|So I built one.'],
-  [74.6, 78.8, 'Next stop: a team that moves fast,|has fun, and makes a dent.'],
+  [0.85, 2.25, "Hey, I'm Aditya."],
+  [2.25, 4.25, "Let me tell you how I got here."],
+  [7.05, 11.79, "I was always the analytical kid.|Math, science, building fun stuff."],
+  [11.79, 13.16, "So: engineering."],
+  [13.16, 17.18, "But I also loved investing,|and how money moves the world."],
+  [17.18, 19.10, "So I added economics."],
+  [19.55, 25.36, "Then, five years at HARMAN in Bengaluru,|building navigation for cars and trucks."],
+  [25.36, 31.43, "When a truck's camera can't see a speed sign,|our map data still knows it."],
+  [31.55, 33.70, "But I kept having business doubts."],
+  [33.70, 36.33, "As an engineer, you get tasks, not a vote."],
+  [36.33, 40.69, "A lot of effort went into things|that just didn't make business sense."],
+  [40.95, 44.66, "I wanted to help decide what gets built,|not just how."],
+  [44.66, 46.60, "So: I recalculated."],
+  [48.65, 51.78, "In 2025, I moved to the US."],
+  [51.78, 55.43, "It's where AI is being built,|and I wanted to be there."],
+  [55.75, 60.44, "At Duke, I picked up the business side:|strategy, finance, marketing."],
+  [60.95, 64.86, "Design Thinking taught me|how to really interview customers."],
+  [64.86, 68.24, "After 15+ interviews, the lesson was simple."],
+  [68.24, 71.74, "People weren't missing information.|They were missing trust."],
+  [72.95, 76.71, "On the side, I'm a little obsessed|with credit card points."],
+  [76.71, 81.38, "I was optimizing everything by hand,|and couldn't find a tool that did it."],
+  [81.38, 83.74, "So I built one: PointsMax."],
+  [84.45, 85.63, "Next stop?"],
+  [85.63, 89.46, "A team that moves fast, has fun,|and makes a real dent."],
+  [89.55, 90.92, "Maybe yours."],
 ];
 
 function render(t) {
@@ -653,7 +661,7 @@ function render(t) {
     if (t >= a && t < tr.at + tr.d / 2) applyTransition(tr, (t - a) / tr.d, scenes[i], scenes[i + 1]);
   });
 
-  odo.setAttribute('opacity', prog(t, 6.9, 7.5) * (1 - prog(t, 81, 82)));
+  odo.setAttribute('opacity', prog(t, 6.9, 7.5) * (1 - prog(t, 90.5, 91.5)));
   let k = ODO.findIndex(o => t < o[0]);
   if (k < 1) k = 1;
   const [t0, y0, p0] = ODO[k - 1], [t1, y1] = ODO[k];
@@ -675,7 +683,7 @@ function render(t) {
   set(capG, { transform: `translate(0 ${(1 - a) * 10})` });
 }
 window.render = render;
-window.DURATION = 85;
+window.DURATION = 94.5;
 render(0);
 </script>
 </body></html>

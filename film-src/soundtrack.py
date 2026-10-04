@@ -1,7 +1,7 @@
 """Original score and sound effects for The Long Way Round.
 
 Everything is synthesised here (no samples), so the track is free to use.
-Run:  python3 film-src/soundtrack.py out.wav
+Run:  python3 film-src/soundtrack.py out.wav [voice.wav]
 Times below match the scene and transition times in film.html.
 """
 import sys
@@ -9,7 +9,7 @@ import numpy as np
 from scipy import signal
 
 SR = 44100
-DUR = 85.0
+DUR = 94.5
 N = int(SR * DUR)
 rng = np.random.default_rng(7)
 
@@ -195,14 +195,14 @@ BEAT = 60 / 96
 # (start, chord, length, section)
 PROG = [
     (0.0, 'Dadd9', 6.5, 'title'),
-    (6.5, 'D', 2.5, 'delhi'), (9.0, 'Bm', 2.5, 'delhi'), (11.5, 'G', 2.5, 'delhi'), (14.0, 'A', 2.0, 'delhi'),
-    (16.0, 'D', 2.5, 'drive'), (18.5, 'A', 2.5, 'drive'), (21.0, 'Bm', 2.5, 'drive'), (23.5, 'G', 2.5, 'drive'), (26.0, 'A', 2.0, 'drive'),
-    (28.0, 'Bm', 2.5, 'doubt'), (30.5, 'G', 2.5, 'doubt'), (33.0, 'Em', 2.5, 'doubt'), (35.5, 'F#', 1.0, 'doubt'),
-    (36.5, 'Em', 2.2, 'recalc'), (38.7, 'Asus', 1.4, 'recalc'), (40.1, 'D', 1.9, 'lift'), (42.0, 'G', 2.0, 'lift'),
-    (44.0, 'G', 2.5, 'flight'), (46.5, 'D', 2.5, 'flight'), (49.0, 'A', 2.0, 'flight'),
-    (51.0, 'Bm', 2.5, 'duke'), (53.5, 'G', 2.5, 'duke'), (56.0, 'D', 2.5, 'duke'), (58.5, 'A', 2.5, 'duke'), (61.0, 'Bm', 2.5, 'duke'), (63.5, 'G', 1.5, 'duke'),
-    (65.0, 'D', 2.5, 'groove'), (67.5, 'A', 2.5, 'groove'), (70.0, 'Bm', 2.5, 'groove'), (72.5, 'G', 1.5, 'groove'),
-    (74.0, 'D', 2.5, 'finale'), (76.5, 'A', 2.5, 'finale'), (79.0, 'Bm', 2.5, 'finale'), (81.5, 'G', 2.0, 'finale'), (83.5, 'D', 1.5, 'end'),
+    (6.5, 'D', 2.5, 'delhi'), (9.0, 'Bm', 2.5, 'delhi'), (11.5, 'G', 2.5, 'delhi'), (14.0, 'A', 2.5, 'delhi'), (16.5, 'D', 2.5, 'delhi'),
+    (19.0, 'D', 2.5, 'drive'), (21.5, 'A', 2.5, 'drive'), (24.0, 'Bm', 2.5, 'drive'), (26.5, 'G', 2.5, 'drive'), (29.0, 'A', 2.0, 'drive'),
+    (31.0, 'Bm', 2.5, 'doubt'), (33.5, 'G', 2.5, 'doubt'), (36.0, 'Em', 2.5, 'doubt'), (38.5, 'F#', 2.0, 'doubt'),
+    (40.5, 'Em', 3.1, 'recalc'), (43.6, 'Asus', 1.4, 'recalc'), (45.0, 'D', 1.5, 'lift'), (46.5, 'G', 1.5, 'lift'),
+    (48.0, 'G', 2.5, 'flight'), (50.5, 'D', 2.5, 'flight'), (53.0, 'A', 2.0, 'flight'),
+    (55.0, 'Bm', 2.5, 'duke'), (57.5, 'G', 2.5, 'duke'), (60.0, 'D', 2.5, 'duke'), (62.5, 'A', 2.5, 'duke'), (65.0, 'Bm', 2.5, 'duke'), (67.5, 'G', 2.5, 'duke'), (70.0, 'D', 2.5, 'duke'),
+    (72.5, 'D', 2.5, 'groove'), (75.0, 'A', 2.5, 'groove'), (77.5, 'Bm', 2.5, 'groove'), (80.0, 'G', 2.5, 'groove'), (82.5, 'A', 1.0, 'groove'),
+    (83.5, 'D', 2.5, 'finale'), (86.0, 'A', 2.5, 'finale'), (88.5, 'Bm', 2.5, 'finale'), (91.0, 'G', 2.0, 'finale'), (93.0, 'D', 1.5, 'end'),
 ]
 
 for start, ch, length, sec in PROG:
@@ -265,60 +265,59 @@ for i, n in enumerate(MOTIF):
     place(music, pluck(hz(n), .9, 1.1), 2.0 + i * BEAT / 2 * 1.5, pan=.2)
 FINALE = ['F#5', 'A5', 'D6', 'C#6', 'A5', 'B5', 'A5', 'F#5', 'D5', 'E5', 'F#5', 'A5', 'B5', 'A5', 'F#5', 'E5']
 for i, n in enumerate(FINALE):
-    place(music, pluck(hz(n), 1.0, .85), 74.0 + i * BEAT, pan=.15)
-place(music, pluck(hz('D6'), 2.4, .9), 74.0 + 16 * BEAT + .1, pan=.15)
+    place(music, pluck(hz(n), 1.0, .85), 83.5 + i * BEAT, pan=.15)
+place(music, pluck(hz('D6'), 2.4, .9), 83.5 + 16 * BEAT + .1, pan=.15)
 GROOVE = ['D5', 'F#5', 'A5', 'F#5', 'E5', 'C#5', 'E5', 'A5', 'F#5', 'D5', 'B4', 'D5', 'G5', 'D5', 'B4', 'G4']
 for i, n in enumerate(GROOVE):
-    place(music, pluck(hz(n), .7, .55), 65.0 + i * BEAT * .9, pan=-.15)
+    place(music, pluck(hz(n), .7, .45), 72.5 + i * BEAT * .9, pan=-.15)
 
 # ---------------- sound effects ----------------
 place(sfx, pop(.8, 500), 0.85)
 for i in range(4):
     place(sfx, pop(.6, 700 + 80 * i), 6.5 + .8 + .25 * i, pan=-.5)
-    place(sfx, pop(.6, 900 + 80 * i), 6.5 + 4.8 + .25 * i, pan=.5)
+    place(sfx, pop(.6, 900 + 80 * i), 6.5 + 6.5 + .25 * i, pan=.5)
 place(sfx, whoosh(1.1, 400, 7000, True, .8), 5.95)                      # iris
-place(sfx, engine_pass(1.6, 1.0), 15.2)                                 # car wipe
-place(sfx, road_hum(12.0, 1.0), 16.0)
-place(sfx, glitch(1.0), 21.8)
-for at in (21.8, 21.86, 22.76, 23.67, 24.57):
+place(sfx, engine_pass(1.6, 1.0), 18.2)                                 # car wipe
+place(sfx, road_hum(12.0, 1.0), 19.0)
+place(sfx, glitch(1.0), 26.8)                                           # camera goes blind
+for at in (26.8, 27.57):
     place(sfx, bell(hz('E6'), .6, .35), at, pan=.3)
-place(sfx, whoosh(1.1, 2000, 300, False, .7), 27.45)                    # into the window
+place(sfx, whoosh(1.1, 2000, 300, False, .7), 30.45)                    # into the window
 for i in range(7):
-    place(sfx, pop(.55, 260 - 10 * i), 29.0 + .55 * i, pan=.4)          # tickets landing
-place(sfx, pop(.7, 900), 31.2)
-place(sfx, whoosh(1.0, 3000, 400, False, .7), 36.0)                     # tilt down
-place(sfx, bell(hz('A5'), 1.2, .6), 38.7)                               # recalculating
-t = 38.9
-while t < 41.1:
+    place(sfx, pop(.55, 260 - 10 * i), 33.9 + .5 * i, pan=.4)           # tickets landing
+place(sfx, pop(.7, 900), 36.6)
+place(sfx, whoosh(1.0, 3000, 400, False, .7), 40.0)                     # tilt down
+place(sfx, bell(hz('A5'), 1.2, .6), 43.6)                               # recalculating
+t = 43.8
+while t < 45.8:
     place(sfx, tick(.8, 1500), t, pan=.25)
+    place(sfx, tick(.6, 1200), t + .2, pan=.25)
     t += .4
-    place(sfx, tick(.6, 1200), t - .2, pan=.25)
-place(sfx, bell(hz('D6'), 1.6, .7), 40.1)
-place(sfx, bell(hz('F#6'), 1.4, .5), 40.25)
-place(sfx, whoosh(1.0, 500, 5000, True, .7), 43.5)                      # push
-jet = whoosh(5.8, 200, 1400, True, .9)
-place(sfx, jet, 44.5, pan=0)
-place(sfx, whoosh(1.6, 200, 2500, True, 1.0), 50.2)                     # clouds
+place(sfx, bell(hz('D6'), 1.6, .7), 45.0)
+place(sfx, bell(hz('F#6'), 1.4, .5), 45.15)
+place(sfx, whoosh(1.0, 500, 5000, True, .7), 47.5)                      # push
+place(sfx, whoosh(5.8, 200, 1400, True, .9), 48.5)                      # jet
+place(sfx, whoosh(1.6, 200, 2500, True, 1.0), 54.2)                     # clouds
 for i in range(5):
-    place(sfx, pop(.45, 1100 + 90 * i), 55.6 + .3 * i, pan=-.4 + .2 * i)
-place(sfx, bell(hz('B5'), 1.0, .55), 58.0)
+    place(sfx, pop(.45, 1100 + 90 * i), 57.6 + .3 * i, pan=-.4 + .2 * i)
+place(sfx, bell(hz('B5'), 1.0, .55), 60.7)
 for i in range(3):
-    place(sfx, pop(.5, 700), 60.0 + .45 * i, pan=-.3 + .3 * i)
+    place(sfx, pop(.5, 700), 64.9 + .45 * i, pan=-.3 + .3 * i)
 for i in range(14):
-    place(sfx, tick(.35, 2200), 60.0 + i * (2.0 / 14))
-place(sfx, bell(hz('D6'), 2.4, .9), 62.6)
-place(sfx, bell(hz('A6'), 2.0, .4), 62.65)
-place(sfx, whoosh(1.1, 500, 6000, True, .7), 64.45)                     # route band
+    place(sfx, tick(.35, 2200), 64.9 + i * (2.5 / 14))
+place(sfx, bell(hz('D6'), 2.4, .9), 70.6)                               # TRUST
+place(sfx, bell(hz('A6'), 2.0, .4), 70.65)
+place(sfx, whoosh(1.1, 500, 6000, True, .7), 71.95)                     # route band
 for i in range(3):
-    place(sfx, pop(.6, 500 + 120 * i), 65.4 + .5 * i, pan=-.5 + .5 * i)
-place(sfx, whoosh(1.2, 600, 4000, True, .5), 69.8)
-place(sfx, bell(hz('E6'), 1.2, .6), 70.8)
-place(sfx, kick(.9), 71.0)
-place(sfx, whoosh(1.3, 300, 8000, True, .8), 73.4)                      # iris out of the phone
-place(sfx, pop(.7, 520), 74.3)
-place(sfx, kick(1.0), 78.8)
-place(sfx, bell(hz('D6'), 3.0, .8), 78.8)
-place(sfx, bell(hz('A5'), 3.0, .5), 78.82)
+    place(sfx, pop(.6, 500 + 120 * i), 72.9 + .5 * i, pan=-.5 + .5 * i)
+place(sfx, whoosh(1.2, 600, 4000, True, .5), 80.5)
+place(sfx, bell(hz('E6'), 1.2, .6), 81.4)
+place(sfx, kick(.9), 81.9)
+place(sfx, whoosh(1.3, 300, 8000, True, .8), 82.9)                      # iris out of the phone
+place(sfx, pop(.7, 520), 83.8)
+place(sfx, kick(1.0), 89.1)
+place(sfx, bell(hz('D6'), 3.0, .8), 89.1)
+place(sfx, bell(hz('A5'), 3.0, .5), 89.12)
 
 # ---------------- mix ----------------
 def reverb(x, secs=2.2, wet=.22):
@@ -333,7 +332,36 @@ def reverb(x, secs=2.2, wet=.22):
 
 music = reverb(music, 2.2, .25)
 sfx = reverb(sfx, 1.2, .12)
+
+voice = None
+if len(sys.argv) > 2:
+    from scipy.io import wavfile as _wf
+    vsr, v = _wf.read(sys.argv[2])
+    v = v.astype(float) / 32767
+    if v.ndim > 1:
+        v = v.mean(axis=1)
+    voice = np.zeros(N)
+    voice[:min(N, len(v))] = v[:N]
+    # duck the music under the narration: fast attack, slow release
+    e = np.abs(voice)
+    e = signal.sosfilt(signal.butter(1, 4, 'low', fs=SR, output='sos'), e)
+    e = np.clip(e / .04, 0, 1)
+    hold = np.maximum.accumulate(np.where(e > .5, np.arange(N), 0))
+    since = (np.arange(N) - hold) / SR
+    duck = np.clip(1 - since / .45, 0, 1) * (hold > 0)
+    duck = signal.sosfilt(signal.butter(1, 6, 'low', fs=SR, output='sos'), duck)
+    music *= (1 - .86 * duck)[:, None]
+    sfx *= (1 - .55 * duck)[:, None]
+    v2 = np.stack([voice, voice], axis=1)
+    voice = reverb(v2, .6, .06)
+
 mix = music * .9 + sfx * 1.0
+if voice is not None:
+    import os
+    if os.environ.get('STEMS'):
+        np.save(os.environ['STEMS'] + '_bed.npy', mix[:, 0])
+        np.save(os.environ['STEMS'] + '_voice.npy', voice[:, 0] * 1.9)
+    mix = mix + voice * 1.9
 
 # fade in/out
 t = np.arange(N) / SR
