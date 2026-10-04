@@ -63,6 +63,7 @@
     <div class="express__actions">
       <a class="btn btn--go" href="./assets/Aditya_Aggarwal_Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
       <a class="btn btn--ghost" href="https://www.linkedin.com/in/adityaxaggarwal" target="_blank" rel="noopener">LinkedIn</a>
+      <button type="button" class="btn btn--ghost" data-film data-close>▶ Watch the film</button>
       <span class="express__email">aditya.aggarwal@duke.edu</span>
     </div>
     <button type="button" class="express__scenic" data-close>Or take the scenic route ↓</button>
@@ -72,7 +73,7 @@
 <!-- ============ FILM ============ -->
 <dialog class="film" id="film" aria-label="The Long Way Round, an animated short film">
   <div class="film__head">
-    <span class="hud-label">The Long Way Round · 80 sec</span>
+    <span class="hud-label">The Long Way Round · 1:25 · sound on</span>
     <button type="button" class="express__close" data-close aria-label="Close film">×</button>
   </div>
   <video id="film-video" poster="./assets/film-poster.jpg" controls playsinline preload="none">
@@ -115,31 +116,30 @@
         <p class="hero__lede">I&rsquo;m Aditya Aggarwal. I spent five years at HARMAN shipping navigation and driver-assist features for Audi, BMW, MAN and Daimler. Today I&rsquo;m at Duke studying engineering management and building PointsMax. Scroll to take the drive.</p>
         <div class="hero__ctas">
           <a href="#origin" class="btn btn--go">Start the drive <span aria-hidden="true">↓</span></a>
-          <button type="button" class="btn btn--ghost" data-film><span aria-hidden="true">▶</span> Watch the 80-second film</button>
+          <button type="button" class="btn btn--ghost" data-film><span aria-hidden="true">▶</span> Watch the film</button>
         </div>
         <button type="button" class="hero__hurry" data-express>In a hurry? Take the express lane →</button>
       </div>
 
-      <div class="routecard" aria-label="Route overview">
-        <div class="routecard__head">
-          <span class="hud-label">Route overview</span>
-          <span class="routecard__status" id="calc">Calculating…</span>
-        </div>
-        <ul class="routecard__legs">
-          <li><b>2016</b><span>IIIT Delhi · ECE + Economics</span></li>
-          <li><b>2020</b><span>HARMAN · Navigation &amp; ADAS</span></li>
-          <li class="is-reroute"><b>2025</b><span>Reroute · Engineering → Product</span></li>
-          <li><b>2025</b><span>Wheels up · Bengaluru → Durham</span></li>
-          <li><b>2025</b><span>Duke · Engineering Management</span></li>
-          <li><b>2026</b><span>PointsMax · Solo founder</span></li>
-          <li class="is-dest"><b>2027</b><span>Your team?</span></li>
-        </ul>
-        <div class="routecard__foot">
+      <figure class="filmcard">
+        <button type="button" class="filmcard__media" data-film aria-label="Play The Long Way Round, an 85-second animated film with sound">
+          <video class="filmcard__teaser" autoplay muted loop playsinline preload="auto" poster="./assets/film-poster.jpg" aria-hidden="true">
+            <source src="./assets/film-teaser.webm" type="video/webm" />
+            <source src="./assets/film-teaser.mp4" type="video/mp4" />
+          </video>
+          <span class="filmcard__play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+          <span class="filmcard__badge" aria-hidden="true">Sound on · 1:25</span>
+        </button>
+        <figcaption class="filmcard__caption">
+          <span class="hud-label">The Long Way Round</span>
+          <span>My story as an 85-second animated road trip.</span>
+        </figcaption>
+        <div class="filmcard__foot">
           <div><b>10</b><span>years</span></div>
           <div><b>14,000</b><span>km flown</span></div>
           <div><b>1</b><span>reroute</span></div>
         </div>
-      </div>
+      </figure>
     </section>
 
     <section class="stop stop--left" id="origin" data-sky="dawn" data-maneuver="Start at IIIT Delhi" data-year="2016.6" data-short="IIIT Delhi">
@@ -395,6 +395,7 @@
           <li><a href="https://www.linkedin.com/in/adityaxaggarwal" target="_blank" rel="noopener">LinkedIn ↗</a></li>
           <li><a href="https://github.com/dosbenq" target="_blank" rel="noopener">GitHub ↗</a></li>
           <li><a href="./assets/Aditya_Aggarwal_Resume.pdf" target="_blank" rel="noopener">Resume (PDF) ↗</a></li>
+          <li><button type="button" class="dest__film" data-film>▶ Replay the film</button></li>
         </ul>
       </div>
     </section>

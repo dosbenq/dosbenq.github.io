@@ -198,10 +198,14 @@ p { margin: 0; }
   align-self: flex-start;
   background: none; border: 0; padding: 0;
   font-family: var(--hud); font-size: 13px; letter-spacing: .04em;
-  color: var(--go);
+  color: var(--paper);
+  text-decoration: underline;
+  text-decoration-color: var(--go);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
   cursor: pointer;
 }
-.hero__hurry:hover { text-decoration: underline; }
+.hero__hurry:hover { color: var(--go); }
 
 /* ============ DRIVE / ROUTE ============ */
 .drive {
@@ -314,36 +318,63 @@ p { margin: 0; }
 .btn--ghost { border-color: color-mix(in srgb, var(--paper) 30%, transparent); color: var(--paper); background: color-mix(in srgb, var(--ink) 40%, transparent); }
 .btn--ghost:hover { border-color: var(--paper); }
 
-.routecard {
+.filmcard {
+  margin: 0;
   background: color-mix(in srgb, var(--dev-bg) 92%, transparent);
   color: var(--dev-text);
   border: 1px solid var(--dev-line);
   border-radius: 18px;
-  padding: 20px;
+  padding: 12px;
   box-shadow: 0 30px 60px -30px #000;
   min-width: 0;
+  display: flex; flex-direction: column; gap: 12px;
 }
-.routecard .hud-label { color: var(--dev-dim); }
-.routecard__head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-.routecard__status { font-family: var(--hud); font-size: 12px; color: var(--go); letter-spacing: .08em; text-transform: uppercase; }
-.routecard__legs { list-style: none; margin: 18px 0; padding: 0 0 0 22px; display: grid; gap: 12px; position: relative; }
-.routecard__legs::before { content: ""; position: absolute; left: 5px; top: 8px; bottom: 8px; border-left: 2px dotted var(--dev-dim); }
-.routecard__legs li { position: relative; display: flex; gap: 14px; align-items: baseline; font-size: 15px; line-height: 1.3; transition: opacity .35s, transform .35s; }
-.routecard__legs li::before {
-  content: ""; position: absolute; left: -22px; top: 4px;
-  width: 12px; height: 12px; border-radius: 50%;
-  background: var(--dev-bg); border: 2px solid var(--sodium);
+.filmcard__media {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0; border: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  cursor: pointer;
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
 }
-.routecard__legs b { font-family: var(--hud); font-weight: 600; font-size: 13px; color: var(--dev-dim); font-variant-numeric: tabular-nums; }
-.routecard__legs li.is-reroute::before { border-color: var(--signal); }
-.routecard__legs li.is-reroute span { color: var(--signal); }
-.routecard__legs li.is-dest::before { background: var(--go); border-color: var(--go); }
-.routecard__legs li.is-dest span { font-family: var(--display); font-weight: 800; }
-.routecard.is-calculating .routecard__legs li { opacity: 0; transform: translateX(-6px); }
-.routecard__foot { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--dev-line); padding-top: 14px; }
-.routecard__foot div { display: flex; flex-direction: column; }
-.routecard__foot b { font-family: var(--display); font-weight: 900; font-size: 26px; line-height: 1; }
-.routecard__foot span { font-family: var(--hud); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--dev-dim); }
+.filmcard__teaser { display: block; width: 100%; height: 100%; object-fit: cover; }
+.filmcard__play {
+  position: absolute; left: 50%; top: 50%;
+  width: 68px; height: 68px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--sodium);
+  display: grid; place-items: center;
+  box-shadow: 0 0 0 10px color-mix(in srgb, var(--sodium) 30%, transparent);
+  transition: transform .2s, box-shadow .2s;
+}
+.filmcard__play svg { width: 30px; height: 30px; fill: var(--dev-bg); margin-left: 4px; }
+.filmcard__media:hover .filmcard__play { transform: translate(-50%, -50%) scale(1.08); box-shadow: 0 0 0 16px color-mix(in srgb, var(--sodium) 25%, transparent); }
+.filmcard__badge {
+  position: absolute; right: 10px; bottom: 10px;
+  font-family: var(--hud); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--dev-text);
+  background: #0b1220cc;
+  padding: 4px 8px; border-radius: 6px;
+}
+.filmcard__caption { display: flex; flex-direction: column; gap: 2px; padding-inline: 6px; font-size: 15px; line-height: 1.4; }
+.filmcard__caption .hud-label { color: var(--sodium); }
+.filmcard__foot { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--dev-line); padding: 12px 6px 4px; }
+.filmcard__foot div { display: flex; flex-direction: column; }
+.filmcard__foot b { font-family: var(--display); font-weight: 900; font-size: 24px; line-height: 1; }
+.filmcard__foot span { font-family: var(--hud); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--dev-dim); }
+
+.dest__film {
+  font-family: var(--display); font-weight: 800; font-size: inherit;
+  color: var(--sodium); background: none; border: 0; padding: 0 0 2px;
+  border-bottom: 2px solid var(--dev-line);
+  cursor: pointer;
+}
+.dest__film:hover { border-color: var(--sodium); }
 
 /* ============ ROAD EVENTS ============ */
 .event {

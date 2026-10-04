@@ -17,12 +17,12 @@ const mixHex = (a, b, t) => {
 /* ============ SKY THEMES ============ */
 // sun position is in fractions of the viewport; stars is an opacity
 const SKIES = {
-  dawn:    { label: 'Dawn',        top: '#241d45', bottom: '#a8586a', core: '#ffe2a8', glow: '#ff8a5c', sx: .80, sy: .95, sun: .85, stars: .25 },
+  dawn:    { label: 'Dawn',        top: '#1d2c52', bottom: '#d9826a', core: '#ffe2a8', glow: '#ff8a5c', sx: .80, sy: .95, sun: .85, stars: .25 },
   day:     { label: 'Midday',      top: '#6fa8dc', bottom: '#dcebf5', core: '#fffbe6', glow: '#ffe7a3', sx: .84, sy: .12, sun: .90, stars: 0 },
   golden:  { label: 'Golden hour', top: '#e9a964', bottom: '#f8e2bf', core: '#fff1c9', glow: '#ffb35c', sx: .86, sy: .62, sun: .90, stars: 0 },
-  dusk:    { label: 'Dusk',        top: '#2a2150', bottom: '#b8506a', core: '#ffcf9a', glow: '#ff6b57', sx: .14, sy: 1.0, sun: .70, stars: .35 },
+  dusk:    { label: 'Dusk',        top: '#1c2748', bottom: '#c86a58', core: '#ffcf9a', glow: '#ff6b57', sx: .14, sy: 1.0, sun: .70, stars: .35 },
   night:   { label: 'Night',       top: '#070c18', bottom: '#16223d', core: '#f2f4ff', glow: '#8aa4d6', sx: .80, sy: .18, sun: .30, stars: 1 },
-  sunrise: { label: 'Sunrise',     top: '#2c3566', bottom: '#f6b27a', core: '#fff1c2', glow: '#ff9a5a', sx: .50, sy: .98, sun: .95, stars: .1 },
+  sunrise: { label: 'Sunrise',     top: '#2b4a7a', bottom: '#f6b27a', core: '#fff1c2', glow: '#ff9a5a', sx: .50, sy: .98, sun: .95, stars: .1 },
 };
 
 /* ============ ROUTE + CAR + HUD + SKY ============ */
@@ -389,21 +389,6 @@ const SKIES = {
   window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(paint, 200); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { lastW = 0; paint(); });
   paint();
-})();
-
-/* ============ ROUTE CARD: "calculating" intro ============ */
-(function () {
-  const card = document.querySelector('.routecard');
-  const status = document.getElementById('calc');
-  const done = 'Fastest route · 7 stops';
-  if (!card || reduceMotion) { if (status) status.textContent = done; return; }
-  card.classList.add('is-calculating');
-  const legs = [...card.querySelectorAll('.routecard__legs li')];
-  setTimeout(() => {
-    card.classList.remove('is-calculating');
-    legs.forEach((li, i) => { li.style.transitionDelay = `${i * 110}ms`; });
-    setTimeout(() => { status.textContent = done; }, legs.length * 110 + 200);
-  }, 700);
 })();
 
 /* ============ EXPRESS LANE ============ */
