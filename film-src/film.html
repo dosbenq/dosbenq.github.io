@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="fonts.css">
+<style>
+  html,body{margin:0;background:#000;overflow:hidden}
+  svg{display:block}
+  .d{font-family:"Overpass","Arial Narrow",sans-serif}
+  .m{font-family:"Overpass Mono",monospace}
+  .s{font-family:"Newsreader",Georgia,serif;font-style:italic}
+</style></head>
+<body>
+<svg id="stage" width="1280" height="720" viewBox="0 0 1280 720"></svg>
+<script>
+/* The Long Way Round: a code-drawn film. render(t) draws the frame at t seconds. */
+const NS = 'http://www.w3.org/2000/svg';
+const stage = document.getElementById('stage');
+const el = (tag, attrs = {}, parent = stage, text) => {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  parent.appendChild(e);
+  return e;
+};
+const set = (e, attrs) => { for (const k in attrs) e.setAttribute(k, attrs[k]); };
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const back = t => { const c = 1.7; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const mix = (a, b, t) => 'rgb(' + hex(a).map((v, i) => Math.round(lerp(v, hex(b)[i], t))).join(',') + ')';
+
+const C = {
+  ink: '#0b1220', paper: '#ece5d3', dim: '#8f9ab0', sodium: '#f5a63d', signal: '#ff6b57', go: '#69d5ae',
+  skin: '#c98b62', skinDark: '#a8704c', hair: '#271a14', jacket: '#1c1b1f', jacketHi: '#3a363b', tee: '#222a3e',
+};
+
+let gradId = 0;
+function grad(stops, vertical = true) {
+  const id = 'g' + (gradId++);
+  const defs = stage.querySelector('defs') || el('defs');
+  const g = el('linearGradient', vertical ? { id, x1: 0, y1: 0, x2: 0, y2: 1 } : { id }, defs);
+  const nodes = stops.map(([o, c]) => el('stop', { offset: o, 'stop-color': c }, g));
+  return { url: `url(#${id})`, nodes };
+}
+
+/* ============ AVATAR ============ */
+// Flat illustration of Aditya: swept-up dark hair, thick brows, stubble,
+// big smile, black leather jacket over a dark tee.
+function avatar(parent, o = {}) {
+  const g = el('g', {}, parent);
+  const body = el('g', {}, g);
+  if (o.backpack) {
+    el('path', { d: 'M-96 150 Q-104 60 -70 40 L-58 44 Q-84 70 -78 150 Z', fill: '#3d5a80' }, body);
+    el('path', { d: 'M96 150 Q104 60 70 40 L58 44 Q84 70 78 150 Z', fill: '#3d5a80' }, body);
+  }
+  el('path', { d: 'M-112 160 Q-110 52 -44 26 L44 26 Q110 52 112 160 Z', fill: C.jacket }, body);
+  el('path', { d: 'M-26 26 L26 26 L16 160 L-16 160 Z', fill: C.tee }, body);
+  el('path', { d: 'M-44 26 L-16 92 L-6 30 Z', fill: '#2c2a2f' }, body);
+  el('path', { d: 'M44 26 L16 92 L6 30 Z', fill: '#2c2a2f' }, body);
+  el('path', { d: 'M-96 70 Q-80 44 -50 38 Q-76 60 -82 96 Z', fill: C.jacketHi, opacity: .7 }, body);
+  el('line', { x1: 14, y1: 92, x2: 10, y2: 160, stroke: '#77706a', 'stroke-width': 2 }, body);
+  if (o.backpack) {
+    el('path', { d: 'M-58 32 L-50 160', stroke: '#3d5a80', 'stroke-width': 12, 'stroke-linecap': 'round' }, body);
+    el('path', { d: 'M58 32 L50 160', stroke: '#3d5a80', 'stroke-width': 12, 'stroke-linecap': 'round' }, body);
+  }
+  el('rect', { x: -15, y: -4, width: 30, height: 34, rx: 8, fill: C.skinDark }, g);
+  const head = el('g', {}, g);
+  el('ellipse', { cx: -45, cy: -36, rx: 8, ry: 13, fill: C.skinDark }, head);
+  el('ellipse', { cx: 45, cy: -36, rx: 8, ry: 13, fill: C.skinDark }, head);
+  el('path', { d: 'M-44 -56 Q-46 -2 -26 12 Q-12 22 0 22 Q12 22 26 12 Q46 -2 44 -56 Q44 -96 0 -96 Q-44 -96 -44 -56 Z', fill: C.skin }, head);
+  el('path', { d: 'M-43 -30 Q-40 8 -24 16 Q-10 24 0 24 Q10 24 24 16 Q40 8 43 -30 Q34 -6 18 -8 Q0 -14 -18 -8 Q-34 -6 -43 -30 Z', fill: '#3a2418', opacity: .26 }, head);
+  // hair: volume on top, swept up and to the side
+  el('path', { d: 'M-47 -50 Q-56 -96 -18 -110 Q14 -124 44 -104 Q62 -90 50 -52 Q46 -74 30 -80 Q8 -88 -18 -82 Q-38 -76 -47 -50 Z', fill: C.hair }, head);
+  el('path', { d: 'M-30 -96 Q-6 -132 34 -118 Q52 -110 54 -92 Q34 -112 6 -106 Q-14 -102 -30 -96 Z', fill: '#3b281f' }, head);
+  el('path', { d: 'M-47 -50 Q-50 -64 -44 -74 L-40 -54 Z', fill: C.hair }, head);
+  el('path', { d: 'M47 -48 Q52 -64 46 -78 L42 -52 Z', fill: C.hair }, head);
+  el('rect', { x: -33, y: -60, width: 25, height: 7, rx: 3.5, fill: C.hair, transform: 'rotate(-4 -20 -56)' }, head);
+  el('rect', { x: 8, y: -60, width: 25, height: 7, rx: 3.5, fill: C.hair, transform: 'rotate(4 20 -56)' }, head);
+  const happy = el('g', { stroke: C.hair, 'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round' }, head);
+  el('path', { d: 'M-28 -40 Q-20 -47 -12 -40' }, happy);
+  el('path', { d: 'M12 -40 Q20 -47 28 -40' }, happy);
+  const open = el('g', { fill: C.hair }, head);
+  el('ellipse', { cx: -20, cy: -40, rx: 4.5, ry: 5.5 }, open);
+  el('ellipse', { cx: 20, cy: -40, rx: 4.5, ry: 5.5 }, open);
+  el('path', { d: 'M-1 -34 Q-7 -18 1 -15', stroke: C.skinDark, 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }, head);
+  const smile = el('path', { d: 'M-19 -3 Q0 16 19 -3 Q0 3 -19 -3 Z', fill: '#fff', stroke: '#5a2d22', 'stroke-width': 2.5, 'stroke-linejoin': 'round' }, head);
+  const flat = el('path', { d: 'M-12 2 Q0 0 12 2', stroke: '#5a2d22', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round' }, head);
+  let arm = null;
+  if (o.arm) {
+    arm = el('g', {}, g);
+    el('path', { d: 'M70 50 Q104 10 118 -56 L142 -50 Q130 20 92 70 Z', fill: C.jacket }, arm);
+    el('circle', { cx: 131, cy: -66, r: 17, fill: C.skin }, arm);
+    el('rect', { x: 122, y: -96, width: 8, height: 22, rx: 4, fill: C.skin, transform: 'rotate(-10 126 -85)' }, arm);
+    el('rect', { x: 132, y: -98, width: 8, height: 24, rx: 4, fill: C.skin }, arm);
+    el('rect', { x: 142, y: -94, width: 8, height: 22, rx: 4, fill: C.skin, transform: 'rotate(10 146 -83)' }, arm);
+  }
+  let phone = null;
+  if (o.phone) {
+    phone = el('g', { transform: 'translate(-20 70) rotate(-8)' }, g);
+    el('rect', { x: -34, y: -60, width: 68, height: 120, rx: 10, fill: '#0b1220', stroke: '#3a363b', 'stroke-width': 3 }, phone);
+    el('rect', { x: -28, y: -52, width: 56, height: 104, rx: 6, fill: '#16223a' }, phone);
+    el('circle', { cx: -40, cy: 30, r: 15, fill: C.skin }, phone);
+    el('circle', { cx: 40, cy: 30, r: 15, fill: C.skin }, phone);
+  }
+  const api = {
+    g, head, arm, phone,
+    mood(m) {
+      happy.setAttribute('display', m === 'smile' ? 'inline' : 'none');
+      open.setAttribute('display', m === 'smile' ? 'none' : 'inline');
+      smile.setAttribute('display', m === 'neutral' ? 'none' : 'inline');
+      flat.setAttribute('display', m === 'neutral' ? 'inline' : 'none');
+    },
+    blink(on) { open.setAttribute('transform', on ? 'translate(0 -40) scale(1 .1) translate(0 40)' : ''); },
+  };
+  api.mood(o.mood || 'smile');
+  return api;
+}
+
+/* side-view car with a small Aditya at the wheel */
+function sideCar(parent) {
+  const g = el('g', {}, parent);
+  el('path', { d: 'M-150 -20 Q-148 -55 -110 -58 L-70 -60 Q-40 -105 10 -106 L55 -106 Q90 -104 115 -62 L150 -55 Q168 -50 168 -25 L168 -8 L-150 -8 Z', fill: C.signal }, g);
+  el('path', { d: 'M-58 -62 Q-34 -97 8 -98 L30 -98 L30 -62 Z', fill: '#bfe3ff', opacity: .85 }, g);
+  el('path', { d: 'M38 -98 L54 -98 Q84 -96 104 -62 L38 -62 Z', fill: '#bfe3ff', opacity: .85 }, g);
+  const driver = el('g', { transform: 'translate(12 -70) scale(.3)' }, g);
+  avatar(driver, {});
+  el('path', { d: 'M-58 -62 L30 -62 L30 -58 L-58 -58 Z', fill: '#c2463a' }, g);
+  el('rect', { x: -150, y: -30, width: 318, height: 4, fill: '#c2463a' }, g);
+  el('circle', { cx: 160, cy: -36, r: 6, fill: '#fff6c8' }, g);
+  el('rect', { x: -152, y: -42, width: 8, height: 10, rx: 2, fill: '#ffb3a6' }, g);
+  const wheels = [-85, 105].map(x => {
+    const w = el('g', {}, g);
+    el('circle', { r: 30, fill: '#111' }, w); el('circle', { r: 14, fill: '#c9ced8' }, w);
+    el('rect', { x: -2, y: -14, width: 4, height: 28, fill: '#555' }, w);
+    return { w, x };
+  });
+  return { g, spin(a) { wheels.forEach(({ w, x }) => set(w, { transform: `translate(${x} -6) rotate(${a})` })); } };
+}
+
+function stars(parent, n, seed) {
+  let s = seed;
+  const r = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  const g = el('g', {}, parent);
+  for (let i = 0; i < n; i++) el('circle', { cx: r() * 1280, cy: r() * 460, r: r() * 1.6 + .4, fill: '#fff', opacity: r() * .7 + .3 }, g);
+  return g;
+}
+
+function textBlock(parent, x, y, lines, attrs) {
+  const t = el('text', { x, y, ...attrs }, parent);
+  lines.forEach((l, i) => el('tspan', { x, dy: i ? '1.2em' : 0 }, t, l));
+  return t;
+}
+
+/* ============ SCENES ============ */
+const scenes = [];
+function scene(start, end, build) {
+  const g = el('g', { opacity: 0 }, stage);
+  const draw = build(g, end - start);
+  scenes.push({ start, end, g, draw });
+}
+
+// 1. Title
+scene(0, 7, (g, dur) => {
+  const sky = grad([[0, '#070c18'], [1, '#2a2150']]);
+  el('rect', { width: 1280, height: 720, fill: sky.url }, g);
+  stars(g, 90, 3);
+  const title = el('text', { x: 640, y: 150, 'text-anchor': 'middle', class: 'd', 'font-size': 76, 'font-weight': 900, fill: C.paper }, g, 'The Long Way Round');
+  const sub = el('text', { x: 640, y: 196, 'text-anchor': 'middle', class: 'm', 'font-size': 18, 'letter-spacing': 5, fill: C.sodium }, g, 'A SHORT FILM ABOUT ADITYA AGGARWAL');
+  const holder = el('g', {}, g);
+  const av = avatar(holder, { arm: true });
+  return t => {
+    title.setAttribute('opacity', prog(t, .2, 1));
+    sub.setAttribute('opacity', prog(t, .6, 1.4));
+    const pop = back(prog(t, .9, 1.6));
+    set(holder, { transform: `translate(640 ${560 + (1 - pop) * 80}) scale(${1.25 * Math.max(.01, pop)})` });
+    const wave = prog(t, 1.8, 2.2);
+    av.arm.setAttribute('opacity', wave);
+    av.arm.setAttribute('transform', `rotate(${(1 - wave) * 40 + Math.sin(t * 9) * 12 * wave} 80 60)`);
+  };
+});
+
+// 2. Delhi: engineering and economics
+scene(7, 16.6, (g) => {
+  const sky = grad([[0, '#3a2f63'], [1, '#ff9e7a']]);
+  el('rect', { width: 1280, height: 720, fill: sky.url }, g);
+  el('circle', { cx: 1040, cy: 470, r: 110, fill: '#ffd28a', opacity: .5 }, g);
+  const city = el('g', { fill: '#5b3a52' }, g);
+  el('path', { d: 'M80 560 L80 430 Q150 370 220 430 L220 560 L185 560 L185 455 Q150 415 115 455 L115 560 Z' }, city);
+  el('rect', { x: 70, y: 415, width: 160, height: 18 }, city);
+  el('path', { d: 'M1120 560 L1132 300 L1148 300 L1160 560 Z' }, city);
+  for (let i = 0; i < 8; i++) el('rect', { x: 260 + i * 105, y: 500 - (i * 37 % 60), width: 80, height: 80 }, city);
+  const holder = el('g', { transform: 'translate(640 470)' }, g);
+  const av = avatar(holder, {});
+  el('rect', { x: 250, y: 560, width: 780, height: 30, rx: 6, fill: '#6b4636' }, g);
+  el('rect', { x: 250, y: 590, width: 780, height: 130, fill: '#4f3328' }, g);
+  el('rect', { x: 520, y: 520, width: 240, height: 40, rx: 4, fill: '#cfd6e2' }, g);
+  el('rect', { x: 540, y: 528, width: 200, height: 4, rx: 2, fill: '#8f9ab0' }, g);
+  const mk = (x, y, label, color) => {
+    const c = el('g', {}, g);
+    el('circle', { cx: 0, cy: 0, r: 44, fill: color, opacity: .92 }, c);
+    el('text', { x: 0, y: 14, 'text-anchor': 'middle', class: 'd', 'font-size': 40, 'font-weight': 900, fill: '#0b1220' }, c, label);
+    return { c, x, y };
+  };
+  const left = [mk(250, 290, 'π', '#bfe3ff'), mk(150, 420, '∑', '#bfe3ff'), mk(380, 190, '⚙', '#bfe3ff'), mk(420, 370, 'Ω', '#bfe3ff')];
+  const right = [mk(1030, 290, '$', '#ffd28a'), mk(1130, 420, '₹', '#ffd28a'), mk(900, 190, '↗', '#ffd28a'), mk(870, 370, '%', '#ffd28a')];
+  const lt = el('text', { x: 290, y: 130, 'text-anchor': 'middle', class: 'm', 'font-size': 20, 'letter-spacing': 6, fill: C.paper }, g, 'ENGINEERING');
+  const rt = el('text', { x: 1000, y: 130, 'text-anchor': 'middle', class: 'm', 'font-size': 20, 'letter-spacing': 6, fill: C.paper }, g, 'ECONOMICS');
+  return t => {
+    av.blink(t % 3.1 > 2.95);
+    left.forEach((o, i) => {
+      const p = back(prog(t, .8 + i * .25, 1.3 + i * .25));
+      set(o.c, { transform: `translate(${o.x} ${o.y + Math.sin(t * 2 + i) * 8}) scale(${Math.max(.01, p)})` });
+    });
+    right.forEach((o, i) => {
+      const p = back(prog(t, 4.8 + i * .25, 5.3 + i * .25));
+      set(o.c, { transform: `translate(${o.x} ${o.y + Math.sin(t * 2 + i + 1) * 8}) scale(${Math.max(.01, p)})` });
+    });
+    lt.setAttribute('opacity', prog(t, .8, 1.4));
+    rt.setAttribute('opacity', prog(t, 4.8, 5.4));
+  };
+});
+
+// 3. Bengaluru: HARMAN, signs from the map
+scene(16.6, 28.6, (g) => {
+  const sky = grad([[0, '#3f7fd1'], [1, '#bfe3ff']]);
+  el('rect', { width: 1280, height: 720, fill: sky.url }, g);
+  el('circle', { cx: 1080, cy: 150, r: 70, fill: '#fff3c4', opacity: .9 }, g);
+  const far = el('g', {}, g);
+  for (let k = 0; k < 2; k++) for (let i = 0; i < 14; i++) {
+    const h = 120 + (i * 73 % 180), w = 70 + (i * 29 % 50), x = k * 1600 + i * 115;
+    el('rect', { x, y: 560 - h, width: w, height: h, fill: '#33476b' }, far);
+    for (let r = 0; r < h / 26 - 1; r++) el('rect', { x: x + 10, y: 560 - h + 12 + r * 26, width: w - 20, height: 8, fill: '#4f6a96', opacity: .6 }, far);
+  }
+  el('rect', { y: 560, width: 1280, height: 160, fill: '#55704f' }, g);
+  el('rect', { y: 575, width: 1280, height: 90, fill: '#2a2f3a' }, g);
+  const dashes = el('g', {}, g);
+  for (let i = 0; i < 24; i++) el('rect', { x: i * 80, y: 617, width: 44, height: 6, fill: '#e9e2cf' }, dashes);
+  const signs = [50, 80, 30, 60, 70, 50].map((v, i) => {
+    const s = el('g', {}, g);
+    el('rect', { x: -3, y: -100, width: 6, height: 110, fill: '#9aa3b2' }, s);
+    el('circle', { cx: 0, cy: -120, r: 28, fill: '#fff', stroke: '#d62f2f', 'stroke-width': 7 }, s);
+    el('text', { x: 0, y: -111, 'text-anchor': 'middle', class: 'd', 'font-size': 24, 'font-weight': 900, fill: '#111' }, s, v);
+    const tag = el('g', { opacity: 0 }, s);
+    el('rect', { x: -44, y: -186, width: 88, height: 26, rx: 13, fill: C.ink }, tag);
+    el('text', { x: 0, y: -168, 'text-anchor': 'middle', class: 'm', 'font-size': 12, 'letter-spacing': 2, fill: C.go }, tag, 'FROM MAP');
+    return { s, tag, i };
+  });
+  const car = sideCar(g);
+  const cam = el('g', { transform: 'translate(1000 40)' }, g);
+  el('rect', { width: 240, height: 44, rx: 10, fill: C.ink, opacity: .9 }, cam);
+  const camDot = el('circle', { cx: 24, cy: 22, r: 7, fill: C.go }, cam);
+  const camTxt = el('text', { x: 42, y: 28, class: 'm', 'font-size': 15, 'letter-spacing': 2, fill: C.paper }, cam, 'CAMERA ON');
+  return t => {
+    const speed = t * 420;
+    set(far, { transform: `translate(${-(speed * .18) % 1600} 0)` });
+    set(dashes, { transform: `translate(${-speed % 80} 0)` });
+    const carX = lerp(-220, 430, ease(prog(t, .2, 1.8)));
+    set(car.g, { transform: `translate(${carX} ${612 + Math.sin(t * 18) * 1.5})` });
+    car.spin(speed * 2);
+    const blind = t > 5.8;
+    camDot.setAttribute('fill', blind ? C.signal : C.go);
+    camTxt.textContent = blind ? 'CAMERA BLIND' : 'CAMERA ON';
+    signs.forEach(o => {
+      const x = 1400 + o.i * 380 - (speed - 1200);
+      set(o.s, { transform: `translate(${x} 585)` });
+      o.tag.setAttribute('opacity', blind && x < 900 ? 1 : 0);
+    });
+  };
+});
+
+// 4. The doubt
+scene(28.6, 37.2, (g) => {
+  el('rect', { width: 1280, height: 720, fill: '#e3e9f1' }, g);
+  el('rect', { x: 820, y: 90, width: 360, height: 300, rx: 8, fill: '#9cc6ee' }, g);
+  for (let i = 0; i < 5; i++) el('rect', { x: 840 + i * 68, y: 390 - (90 + i * 37 % 120), width: 52, height: 90 + i * 37 % 120, fill: '#5d79a8' }, g);
+  el('rect', { x: 820, y: 90, width: 360, height: 300, rx: 8, fill: 'none', stroke: '#c9d3e0', 'stroke-width': 14 }, g);
+  const holder = el('g', { transform: 'translate(560 470)' }, g);
+  const av = avatar(holder, { mood: 'neutral' });
+  el('rect', { x: 160, y: 560, width: 960, height: 30, rx: 6, fill: '#8a9bb3' }, g);
+  el('rect', { x: 160, y: 590, width: 960, height: 130, fill: '#6f8099' }, g);
+  const tickets = [];
+  for (let i = 0; i < 7; i++) {
+    const tk = el('g', {}, g);
+    el('rect', { x: -80, y: -16, width: 160, height: 32, rx: 6, fill: '#fff', stroke: '#c9d3e0' }, tk);
+    el('text', { x: -66, y: 6, class: 'm', 'font-size': 14, fill: '#16213a' }, tk, `TASK #${4127 + i}`);
+    tickets.push(tk);
+  }
+  const bubble = el('g', { opacity: 0 }, g);
+  el('circle', { cx: 650, cy: 330, r: 8, fill: '#fff' }, bubble);
+  el('circle', { cx: 680, cy: 290, r: 14, fill: '#fff' }, bubble);
+  el('ellipse', { cx: 780, cy: 200, rx: 130, ry: 80, fill: '#fff' }, bubble);
+  el('text', { x: 780, y: 190, 'text-anchor': 'middle', class: 'd', 'font-size': 30, 'font-weight': 900, fill: '#16213a' }, bubble, 'Does this make');
+  el('text', { x: 780, y: 226, 'text-anchor': 'middle', class: 'd', 'font-size': 30, 'font-weight': 900, fill: '#a3530a' }, bubble, 'business sense?');
+  return t => {
+    av.blink(t % 2.7 > 2.55);
+    tickets.forEach((tk, i) => {
+      const p = ease(prog(t, .4 + i * .55, .9 + i * .55));
+      set(tk, { transform: `translate(${900 - (i % 2) * 14} ${lerp(-60, 540 - i * 34, p)}) rotate(${(i % 3 - 1) * 3})` });
+    });
+    bubble.setAttribute('opacity', prog(t, 3.2, 3.8));
+  };
+});
+
+// 5. Road closed, recalculating (top-down map)
+scene(37.2, 44.6, (g) => {
+  el('rect', { width: 1280, height: 720, fill: '#1b1d3a' }, g);
+  const streets = el('g', { stroke: '#2e3360', 'stroke-width': 26 }, g);
+  [200, 520, 840, 1160].forEach(x => el('line', { x1: x, y1: 0, x2: x, y2: 720 }, streets));
+  [130, 360, 590].forEach(y => el('line', { x1: 0, y1: y, x2: 1280, y2: y }, streets));
+  el('line', { x1: 520, y1: 720, x2: 520, y2: 360, stroke: '#0b1220', 'stroke-width': 12, 'stroke-linecap': 'round' }, g);
+  el('line', { x1: 520, y1: 720, x2: 520, y2: 380, stroke: C.dim, 'stroke-width': 7, 'stroke-dasharray': '2 12', 'stroke-linecap': 'round', opacity: .6 }, g);
+  const block = el('g', { transform: 'translate(520 300)' }, g);
+  el('rect', { x: -60, y: -12, width: 120, height: 24, rx: 4, fill: '#fff' }, block);
+  for (let i = 0; i < 4; i++) el('rect', { x: -56 + i * 30, y: -12, width: 14, height: 24, fill: '#d62f2f', transform: `skewX(-20)` }, block);
+  el('text', { x: 0, y: -26, 'text-anchor': 'middle', class: 'm', 'font-size': 16, 'letter-spacing': 3, fill: '#fff' }, block, 'ROAD CLOSED');
+  const newRoute = el('path', { d: 'M520 720 L520 360 L1300 360', fill: 'none', stroke: C.sodium, 'stroke-width': 8, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+  const oldRoute = el('path', { d: 'M520 720 L520 330', fill: 'none', stroke: C.sodium, 'stroke-width': 8, 'stroke-linecap': 'round' }, g);
+  const car = el('g', {}, g);
+  el('path', { d: 'M-8 -20 L-24 -52 L24 -52 L8 -20 Z', fill: '#fff6c8', opacity: .25 }, car);
+  el('rect', { x: -14, y: -24, width: 28, height: 48, rx: 9, fill: C.signal, stroke: C.ink, 'stroke-width': 2 }, car);
+  el('path', { d: 'M-11 -11 Q0 -17 11 -11 L9 -3 L-9 -3 Z', fill: C.ink, opacity: .8 }, car);
+  el('rect', { x: -10, y: 11, width: 20, height: 6, rx: 2, fill: C.ink, opacity: .8 }, car);
+  const hud = el('g', { transform: 'translate(440 40)' }, g);
+  el('rect', { width: 400, height: 64, rx: 12, fill: C.ink, stroke: '#24314a' }, hud);
+  const arrowBox = el('rect', { x: 10, y: 10, width: 44, height: 44, rx: 8, fill: C.sodium }, hud);
+  const hudArrow = el('path', { d: 'M32 18 l12 14 h-8 v14 h-8 v-14 h-8 z', fill: C.ink }, hud);
+  const hudSmall = el('text', { x: 70, y: 28, class: 'm', 'font-size': 13, 'letter-spacing': 2, fill: C.dim }, hud, 'IN 300 M');
+  const hudBig = el('text', { x: 70, y: 50, class: 'd', 'font-size': 22, 'font-weight': 800, fill: C.paper }, hud, 'Continue: Engineering');
+  const pathLen = 360 + 780;
+  newRoute.setAttribute('stroke-dasharray', `${pathLen} ${pathLen}`);
+  oldRoute.setAttribute('stroke-dasharray', '390 390');
+  return t => {
+    // drive up, stop at the barrier, recalculate, turn right
+    let x = 520, y, rot = 0;
+    const up = ease(prog(t, 0, 2.2));
+    if (t < 3.8) { y = lerp(760, 380, up); }
+    else {
+      const turn = ease(prog(t, 3.8, 4.6));
+      const go = ease(prog(t, 4.6, 7));
+      y = lerp(380, 360, turn); rot = 90 * turn; x = 520 + go * 820;
+    }
+    set(car, { transform: `translate(${x} ${y}) rotate(${rot})` });
+    oldRoute.setAttribute('stroke-dashoffset', 390 - 390 * up);
+    oldRoute.setAttribute('opacity', t < 3.4 ? 1 : 0.15);
+    const nr = ease(prog(t, 3.2, 4.4));
+    newRoute.setAttribute('stroke-dashoffset', pathLen - (360 + 780 * nr) * (t > 3.2 ? 1 : 0));
+    newRoute.setAttribute('opacity', t > 3.2 ? 1 : 0);
+    const recalc = t > 2.2 && t < 3.6;
+    arrowBox.setAttribute('fill', recalc ? C.signal : C.sodium);
+    hudArrow.setAttribute('transform', t >= 3.6 ? 'rotate(90 32 32)' : '');
+    hudSmall.textContent = recalc ? 'PLEASE WAIT' : t >= 3.6 ? 'NOW' : 'IN 300 M';
+    hudBig.textContent = recalc ? (Math.floor(t * 4) % 2 ? 'Recalculating…' : 'Recalculating') : t >= 3.6 ? 'Turn right: Product' : 'Continue: Engineering';
+  };
+});
+
+// 6. Flight
+scene(44.6, 51.8, (g) => {
+  const sky = grad([[0, '#1c1840'], [1, '#c0546a']]);
+  el('rect', { width: 1280, height: 720, fill: sky.url }, g);
+  stars(g, 40, 9);
+  el('path', { d: 'M0 640 Q640 560 1280 640 L1280 720 L0 720 Z', fill: '#2a2150' }, g);
+  const clouds = el('g', { fill: '#fff', opacity: .14 }, g);
+  for (let i = 0; i < 8; i++) el('ellipse', { cx: i * 220, cy: 480 + (i % 3) * 40, rx: 120, ry: 26 }, clouds);
+  const arc = el('path', { d: 'M150 560 Q640 40 1130 560', fill: 'none', stroke: C.paper, 'stroke-width': 3, 'stroke-dasharray': '4 14', opacity: .6 }, g);
+  const trail = el('path', { d: 'M150 560 Q640 40 1130 560', fill: 'none', stroke: C.sodium, 'stroke-width': 6, 'stroke-linecap': 'round' }, g);
+  const L = arc.getTotalLength();
+  trail.setAttribute('stroke-dasharray', `${L} ${L}`);
+  [[150, 'BLR', 'Bengaluru'], [1130, 'RDU', 'Raleigh–Durham']].forEach(([x, code, name]) => {
+    el('circle', { cx: x, cy: 560, r: 10, fill: C.sodium }, g);
+    el('text', { x, y: 610, 'text-anchor': 'middle', class: 'd', 'font-size': 40, 'font-weight': 900, fill: C.paper }, g, code);
+    el('text', { x, y: 636, 'text-anchor': 'middle', class: 'm', 'font-size': 14, 'letter-spacing': 2, fill: C.paper, opacity: .7 }, g, name.toUpperCase());
+  });
+  const km = el('text', { x: 640, y: 440, 'text-anchor': 'middle', class: 'm', 'font-size': 22, 'letter-spacing': 4, fill: C.paper }, g, '');
+  const plane = el('g', {}, g);
+  el('path', { d: 'M-40 0 Q-40 -10 -28 -10 L30 -10 Q48 -8 54 0 Q48 8 30 10 L-28 10 Q-40 10 -40 0 Z', fill: C.paper }, plane);
+  el('path', { d: 'M-4 -8 L-24 -44 L-10 -44 L18 -8 Z', fill: '#cfc6b0' }, plane);
+  el('path', { d: 'M-4 8 L-24 34 L-12 34 L16 8 Z', fill: '#cfc6b0' }, plane);
+  el('path', { d: 'M-34 -8 L-44 -28 L-36 -28 L-24 -8 Z', fill: C.signal }, plane);
+  for (let i = 0; i < 5; i++) el('circle', { cx: 6 + i * 8, cy: -2, r: 2.2, fill: '#16223a' }, plane);
+  return t => {
+    const p = ease(prog(t, .5, 6.2));
+    const pt = arc.getPointAtLength(L * p), q = arc.getPointAtLength(Math.min(L, L * p + 1));
+    const ang = Math.atan2(q.y - pt.y, q.x - pt.x) * 180 / Math.PI;
+    set(plane, { transform: `translate(${pt.x} ${pt.y}) rotate(${ang}) scale(1.3)` });
+    trail.setAttribute('stroke-dashoffset', L - L * p);
+    km.textContent = `${Math.round(14000 * p).toLocaleString('en-US')} KM`;
+    set(clouds, { transform: `translate(${-t * 60} 0)` });
+  };
+});
+
+// 7. Duke
+scene(51.8, 60.2, (g) => {
+  const sky = grad([[0, '#070c18'], [1, '#16223d']]);
+  el('rect', { width: 1280, height: 720, fill: sky.url }, g);
+  stars(g, 120, 17);
+  el('circle', { cx: 1110, cy: 110, r: 46, fill: '#f2f4ff', opacity: .9 }, g);
+  el('circle', { cx: 1126, cy: 100, r: 42, fill: '#0c1424' }, g);
+  const chapel = el('g', { fill: '#24314a', transform: 'translate(820 210) scale(1.4)' }, g);
+  el('path', { d: 'M10 360 V250 L60 214 L110 250 V360 Z' }, chapel);
+  el('path', { d: 'M150 360 V250 L200 214 L250 250 V360 Z' }, chapel);
+  el('rect', { x: 96, y: 96, width: 68, height: 264 }, chapel);
+  el('path', { d: 'M96 96 L130 30 L164 96 Z' }, chapel);
+  el('path', { d: 'M118 200 V170 Q130 152 142 170 V200 Z', fill: '#f5a63d', opacity: .6 }, chapel);
+  el('rect', { y: 650, width: 1280, height: 70, fill: '#0e1626' }, g);
+  const holder = el('g', { transform: 'translate(420 566)' }, g);
+  const av = avatar(holder, { backpack: true });
+  const bubbles = [[140, 200, 'WHY?'], [560, 150, '15+ INTERVIEWS'], [700, 300, 'WHO DO YOU TRUST?']].map(([x, y, txt], i) => {
+    const b = el('g', {}, g);
+    const w = txt.length * 13 + 40;
+    el('rect', { x: -w / 2, y: -26, width: w, height: 52, rx: 26, fill: C.paper }, b);
+    el('text', { x: 0, y: 7, 'text-anchor': 'middle', class: 'm', 'font-size': 17, 'letter-spacing': 2, fill: C.ink }, b, txt);
+    return { b, x, y, i };
+  });
+  const trust = el('g', {}, g);
+  el('rect', { x: -110, y: -40, width: 220, height: 80, rx: 40, fill: C.go }, trust);
+  el('text', { x: 0, y: 14, 'text-anchor': 'middle', class: 'd', 'font-size': 40, 'font-weight': 900, fill: C.ink }, trust, 'TRUST');
+  return t => {
+    av.blink(t % 3.3 > 3.15);
+    bubbles.forEach(o => {
+      const p = back(prog(t, .6 + o.i * .7, 1.1 + o.i * .7));
+      const out = 1 - prog(t, 4.2, 4.6);
+      set(o.b, { transform: `translate(${o.x} ${o.y + Math.sin(t * 2 + o.i) * 6}) scale(${Math.max(.01, p * out)})` });
+    });
+    const tp = back(prog(t, 4.6, 5.2));
+    set(trust, { transform: `translate(660 230) scale(${Math.max(.01, tp)})` });
+  };
+});
+
+// 8. PointsMax
+scene(60.2, 69.4, (g) => {
+  const sky = grad([[0, '#121a33'], [1, '#2c3566']]);
+  el('rect', { width: 1280, height: 720, fill: sky.url }, g);
+  stars(g, 50, 23);
+  const lines = el('g', {}, g);
+  const holder = el('g', { transform: 'translate(640 470)' }, g);
+  const av = avatar(holder, { phone: true });
+  const screen = el('g', { transform: 'translate(620 540) rotate(-8)' }, g);
+  const best = el('text', { x: 0, y: -10, 'text-anchor': 'middle', class: 'm', 'font-size': 11, fill: C.go }, screen, 'BEST');
+  const best2 = el('text', { x: 0, y: 6, 'text-anchor': 'middle', class: 'm', 'font-size': 11, fill: C.go }, screen, 'ROUTE ✓');
+  const cards = [['CARD POINTS', 200, 180, '#2a6fdb'], ['AIRLINE MILES', 200, 380, '#ff6b57'], ['HOTEL POINTS', 1080, 280, '#69d5ae']].map(([name, x, y, color], i) => {
+    const c = el('g', {}, g);
+    el('rect', { x: -110, y: -60, width: 220, height: 120, rx: 14, fill: color }, c);
+    el('rect', { x: -90, y: -30, width: 36, height: 26, rx: 4, fill: '#ffd28a' }, c);
+    el('text', { x: -90, y: 40, class: 'm', 'font-size': 15, 'letter-spacing': 2, fill: '#fff' }, c, name);
+    const line = el('path', { d: `M${x + (x < 640 ? 110 : -110)} ${y} Q${x < 640 ? 420 : 860} ${y + 160} ${x < 640 ? 580 : 680} 530`, fill: 'none', stroke: C.sodium, 'stroke-width': 4, 'stroke-dasharray': '6 10', opacity: 0 }, lines);
+    return { c, x, y, i, line };
+  });
+  const logo = el('text', { x: 640, y: 120, 'text-anchor': 'middle', class: 'd', 'font-size': 72, 'font-weight': 900, fill: C.sodium, opacity: 0 }, g, 'PointsMax');
+  return t => {
+    av.blink(t % 2.9 > 2.75);
+    cards.forEach(o => {
+      const p = back(prog(t, .4 + o.i * .5, .9 + o.i * .5));
+      const jig = t < 4.4 ? Math.sin(t * 7 + o.i) * 6 : 0;
+      set(o.c, { transform: `translate(${o.x + jig} ${o.y + Math.sin(t * 1.7 + o.i) * 8}) rotate(${(o.i - 1) * 6}) scale(${Math.max(.01, p)})` });
+      o.line.setAttribute('opacity', prog(t, 4.8 + o.i * .25, 5.2 + o.i * .25));
+    });
+    const on = prog(t, 5.8, 6.2);
+    best.setAttribute('opacity', on); best2.setAttribute('opacity', on);
+    logo.setAttribute('opacity', prog(t, 6, 6.6));
+  };
+});
+
+// 9. Sunrise: your team?
+scene(69.4, 80, (g) => {
+  const sky = grad([[0, '#2c3566'], [1, '#f6b27a']]);
+  el('rect', { width: 1280, height: 720, fill: sky.url }, g);
+  const sun = el('circle', { cx: 640, cy: 640, r: 150, fill: '#ffe2a0' }, g);
+  el('rect', { y: 600, width: 1280, height: 120, fill: '#3b3448' }, g);
+  el('path', { d: 'M600 600 L680 600 L900 720 L380 720 Z', fill: '#2a2f3a' }, g);
+  for (let i = 0; i < 3; i++) el('rect', { x: 636 - i * 4, y: 612 + i * 34, width: 8 + i * 8, height: 14 + i * 8, fill: '#e9e2cf' }, g);
+  const flag = el('g', { transform: 'translate(1030 330)' }, g);
+  el('rect', { x: 0, y: 0, width: 6, height: 280, fill: C.paper }, flag);
+  const cloth = el('g', {}, flag);
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 6; c++) el('rect', { x: 6 + c * 20, y: r * 20, width: 20, height: 20, fill: (r + c) % 2 ? C.ink : C.paper }, cloth);
+  const holder = el('g', {}, g);
+  const av = avatar(holder, { arm: true });
+  const title = el('text', { x: 640, y: 150, 'text-anchor': 'middle', class: 'd', 'font-size': 96, 'font-weight': 900, fill: C.paper }, g, 'Your team?');
+  const url = el('text', { x: 640, y: 200, 'text-anchor': 'middle', class: 'm', 'font-size': 22, 'letter-spacing': 4, fill: C.ink }, g, 'DOSBENQ.GITHUB.IO');
+  return t => {
+    set(sun, { cy: lerp(700, 600, ease(prog(t, 0, 5))) });
+    set(cloth, { transform: `skewY(${Math.sin(t * 6) * 4})` });
+    const pop = back(prog(t, .3, 1));
+    set(holder, { transform: `translate(400 ${545 + (1 - pop) * 60}) scale(${1.1 * Math.max(.01, pop)})` });
+    const wave = prog(t, 1, 1.4);
+    av.arm.setAttribute('opacity', wave);
+    av.arm.setAttribute('transform', `rotate(${(1 - wave) * 40 + Math.sin(t * 9) * 12 * wave} 80 60)`);
+    title.setAttribute('opacity', prog(t, 4.8, 5.6));
+    url.setAttribute('opacity', prog(t, 5.6, 6.2));
+  };
+});
+
+/* ============ OVERLAYS: odometer + captions ============ */
+const odo = el('g', { transform: 'translate(36 32)' });
+el('rect', { width: 300, height: 60, rx: 12, fill: C.ink, opacity: .88 }, odo);
+el('text', { x: 18, y: 24, class: 'm', 'font-size': 12, 'letter-spacing': 3, fill: C.dim }, odo, 'ODOMETER');
+const odoVal = el('text', { x: 18, y: 48, class: 'm', 'font-size': 22, 'font-weight': 600, fill: C.paper }, odo, '');
+const odoPlace = el('text', { x: 282, y: 48, 'text-anchor': 'end', class: 'd', 'font-size': 17, 'font-weight': 800, fill: C.sodium }, odo, '');
+const ODO = [[7, 2016.6, 'NEW DELHI'], [16.6, 2020.8, 'BENGALURU'], [28.6, 2023.2, 'BENGALURU'], [37.2, 2025.3, 'BENGALURU'], [44.6, 2025.55, 'IN FLIGHT'], [51.8, 2025.65, 'DURHAM, NC'], [60.2, 2026.0, 'DURHAM, NC'], [69.4, 2026.9, 'DURHAM, NC'], [80, 2027.0, 'NEXT STOP']];
+const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
+const capG = el('g', {});
+const capBg = el('rect', { rx: 14, fill: C.ink, opacity: .82 }, capG);
+const capText = el('text', { 'text-anchor': 'middle', class: 'd', 'font-size': 28, 'font-weight': 800, fill: C.paper }, capG);
+const CAPTIONS = [
+  [3.0, 6.8, "Hi, I'm Aditya. This is how I got here."],
+  [7.6, 11.8, 'Delhi, 2016. I was always the analytical kid:|math, science, and building fun things with them.'],
+  [12.0, 16.4, 'But I loved the business side too:|investing, and how money moves the world.'],
+  [17.0, 22.2, 'Bengaluru, 2020. Five years at HARMAN,|teaching cars and trucks to read the road.'],
+  [22.6, 28.3, 'When the camera went blind,|my map data kept the speed signs coming.'],
+  [29.0, 32.9, 'But I kept having business doubts.|Engineers get tasks, not a vote.'],
+  [33.1, 37.0, "Too much effort went into things|that didn't make business sense."],
+  [37.5, 40.9, 'I wanted to help decide what gets built,|not only how.'],
+  [41.1, 44.4, 'So: recalculating. Engineering → Product.'],
+  [45.0, 51.5, "2025. The US is at the forefront of AI,|and I wanted to be where it's being built."],
+  [52.2, 56.0, 'Duke. Engineering management:|business skills, pointed at high tech.'],
+  [56.2, 60.0, '15+ user interviews taught me the real barrier|is often trust, not information.'],
+  [60.6, 64.9, 'My side passion: credit card points.|Loyalty is skewed, and I was optimizing it all by hand.'],
+  [65.1, 69.2, 'No tool did it for me.|So I built one.'],
+  [69.8, 74.2, 'Next stop: a team that moves fast,|has fun, and makes a dent.'],
+];
+
+function render(t) {
+  scenes.forEach(s => {
+    const on = t >= s.start && t < s.end + .6;
+    s.g.setAttribute('display', on ? 'inline' : 'none');
+    if (!on) return;
+    const fadeIn = s.start === 0 ? 1 : prog(t, s.start, s.start + .6);
+    s.g.setAttribute('opacity', fadeIn);
+    s.draw(t - s.start);
+  });
+  // later scenes are drawn on top, so fading the next one in is a crossfade
+
+  odo.setAttribute('opacity', prog(t, 7.2, 7.8) * (1 - prog(t, 76, 77)));
+  let k = ODO.findIndex(o => t < o[0]);
+  if (k < 1) k = 1;
+  const [t0, y0, p0] = ODO[k - 1], [t1, y1] = ODO[k];
+  const y = lerp(y0, y1, clamp((t - t0) / (t1 - t0)));
+  odoVal.textContent = `${MONTHS[Math.floor((y % 1) * 12)]} ${Math.floor(y)}`;
+  odoPlace.textContent = p0;
+
+  const cap = CAPTIONS.find(c => t >= c[0] && t < c[1]);
+  if (!cap) { capG.setAttribute('opacity', 0); return; }
+  const lines = cap[2].split('|');
+  capText.textContent = '';
+  lines.forEach((l, i) => el('tspan', { x: 640, dy: i ? '1.25em' : 0 }, capText, l));
+  const h = lines.length * 35 + 22, w = Math.max(...lines.map(l => l.length)) * 14.5 + 60;
+  const top = 700 - h;
+  set(capText, { x: 640, y: top + 40 });
+  set(capBg, { x: 640 - w / 2, y: top, width: w, height: h });
+  capG.setAttribute('opacity', clamp(Math.min(t - cap[0], cap[1] - t) / .3));
+}
+window.render = render;
+window.DURATION = 80;
+render(0);
+</script>
+</body></html>

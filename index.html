@@ -4,10 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Aditya Aggarwal</title>
-  <meta name="description" content="Aditya Aggarwal: five years building navigation and ADAS software at HARMAN, now a product manager in training at Duke. Take the drive." />
-  <meta property="og:title" content="Aditya Aggarwal: Rerouting" />
+  <meta name="description" content="Aditya Aggarwal: five years building navigation and ADAS software at HARMAN, now at Duke and building PointsMax. Take the drive." />
+  <meta property="og:title" content="Aditya Aggarwal: The Long Way Round" />
   <meta property="og:description" content="I built the software that tells cars what's ahead. Now I build products." />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://dosbenq.github.io/" />
+  <meta property="og:image" content="https://dosbenq.github.io/assets/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b1220'/%3E%3Cpath d='M6 26 C10 14 22 20 26 6' fill='none' stroke='%23f5a63d' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='26' cy='6' r='3.5' fill='%23ece5d3'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800;900&family=Overpass+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet" />
@@ -15,11 +19,17 @@
 </head>
 <body>
 
+<!-- Fixed sky: colour, sun and stars are blended by app.js as you scroll -->
+<div class="sky" id="sky" aria-hidden="true">
+  <div class="sky__stars" id="stars"></div>
+  <div class="sky__sun" id="sun"></div>
+</div>
+
 <!-- ============ FIXED HUD ============ -->
-<div class="hud-top" aria-live="polite">
+<div class="hud-top">
   <div class="hud-top__inner">
     <svg class="hud-top__arrow" id="hud-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l6 7h-4v11h-4V10H6z"/></svg>
-    <div class="hud-top__text">
+    <div class="hud-top__text" aria-live="polite">
       <span class="hud-top__dist" id="hud-dist">Start</span>
       <span class="hud-top__maneuver" id="hud-maneuver">Scroll to begin the drive</span>
     </div>
@@ -28,242 +38,367 @@
       <ol id="horizon-list"></ol>
     </div>
     <div class="hud-top__odo" aria-hidden="true">
-      <span class="hud-label">Odometer</span>
+      <span class="hud-label" id="sky-label">Dawn</span>
       <span class="hud-odo__val" id="odo">AUG 2016</span>
     </div>
+    <button type="button" class="hud-top__express" data-express>Express lane</button>
   </div>
 </div>
+
+<!-- ============ EXPRESS LANE ============ -->
+<dialog class="express" id="express" aria-labelledby="express-title">
+  <div class="express__inner">
+    <div class="express__head">
+      <span class="hud-label">Express lane · 30 seconds</span>
+      <button type="button" class="express__close" data-close aria-label="Close express lane">×</button>
+    </div>
+    <h2 id="express-title">Aditya Aggarwal</h2>
+    <p class="express__sub">Engineer turned product builder · Duke MEM, December 2026 · ex-HARMAN</p>
+    <ul class="express__points">
+      <li><b>5 years at HARMAN</b> shipping navigation and ADAS for Audi, BMW, MAN and Daimler. 95% of sprint commitments met over 24 sprints; release cycles cut by 4 months.</li>
+      <li><b>$500K in funding</b> won with a six-week proof of concept and build-vs-partner analysis for EU Intelligent Speed Assistance.</li>
+      <li><b>PointsMax</b>, an AI rewards optimizer I built solo from zero to a beta with 10+ testers.</li>
+      <li><b>3.92 GPA</b> at Duke&rsquo;s Master of Engineering Management.</li>
+    </ul>
+    <div class="express__actions">
+      <a class="btn btn--go" href="./assets/Aditya_Aggarwal_Resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
+      <a class="btn btn--ghost" href="https://www.linkedin.com/in/adityaxaggarwal" target="_blank" rel="noopener">LinkedIn</a>
+      <span class="express__email">aditya.aggarwal@duke.edu</span>
+    </div>
+    <button type="button" class="express__scenic" data-close>Or take the scenic route ↓</button>
+  </div>
+</dialog>
+
+<!-- ============ FILM ============ -->
+<dialog class="film" id="film" aria-label="The Long Way Round, an animated short film">
+  <div class="film__head">
+    <span class="hud-label">The Long Way Round · 80 sec</span>
+    <button type="button" class="express__close" data-close aria-label="Close film">×</button>
+  </div>
+  <video id="film-video" poster="./assets/film-poster.jpg" controls playsinline preload="none">
+    <source src="./assets/film.webm" type="video/webm" />
+    <source src="./assets/film.mp4" type="video/mp4" />
+  </video>
+</dialog>
 
 <main class="drive" id="drive">
 
   <!-- The route is generated by app.js from the .stop__pin positions -->
   <svg class="route" id="route" aria-hidden="true">
     <path id="route-planned" class="route__planned" />
+    <path id="route-casing" class="route__casing" />
     <path id="route-driven" class="route__driven" />
-    <g id="car" class="car"><circle r="16" class="car__halo"/><path d="M0 -11 L8 9 L0 4 L-8 9 Z" class="car__body"/></g>
+    <g id="car" class="car">
+      <circle r="22" class="car__halo"/>
+      <g id="car-shape">
+        <path d="M-5 -14 L-14 -34 L14 -34 L5 -14 Z" class="car__beam"/>
+        <rect x="-9" y="-15" width="18" height="30" rx="6" class="car__body"/>
+        <path d="M-7 -7 Q0 -11 7 -7 L6 -2 L-6 -2 Z" class="car__glass"/>
+        <rect x="-6" y="7" width="12" height="4" rx="1.5" class="car__glass"/>
+        <circle cx="-5.5" cy="-13.5" r="1.6" class="car__light"/><circle cx="5.5" cy="-13.5" r="1.6" class="car__light"/>
+      </g>
+      <g id="plane-shape" display="none">
+        <path d="M0 -20 C2 -20 3 -16 3 -12 L3 -4 L18 4 L18 8 L3 4 L2 13 L7 17 L7 20 L0 18 L-7 20 L-7 17 L-2 13 L-3 4 L-18 8 L-18 4 L-3 -4 L-3 -12 C-3 -16 -2 -20 0 -20 Z" class="car__body"/>
+      </g>
+    </g>
   </svg>
 
-  <!-- ============ HERO ============ -->
-  <section class="hero stop" data-maneuver="Head out from New Delhi" data-year="2016.6" data-short="Start">
-    <span class="stop__pin" data-side="center"></span>
-    <div class="hero__copy">
-      <p class="eyebrow">Route · New Delhi → Bengaluru → Durham → <span class="blink">?</span></p>
-      <h1 class="hero__title">I built the software that tells cars what&rsquo;s ahead.<span>Now I build products.</span></h1>
-      <p class="hero__lede">I&rsquo;m Aditya Aggarwal. I spent five years at HARMAN shipping navigation and driver-assist features for Audi, BMW, MAN and Daimler. Today I&rsquo;m at Duke studying engineering management and building PointsMax. Scroll to take the drive.</p>
-      <div class="hero__ctas">
-        <a href="#origin" class="btn btn--go">Start the drive <span aria-hidden="true">↓</span></a>
-        <a href="#destination" class="btn btn--ghost">Skip to destination</a>
-      </div>
-    </div>
+  <!-- ===================== DELHI ===================== -->
+  <div class="region" data-city="delhi">
+    <canvas class="region__map" aria-hidden="true"></canvas>
 
-    <div class="routecard" aria-label="Route overview">
-      <div class="routecard__head">
-        <span class="hud-label">Route overview</span>
-        <span class="routecard__status" id="calc">Calculating…</span>
-      </div>
-      <ul class="routecard__legs">
-        <li><b>2016</b><span>IIIT Delhi · ECE + Economics</span></li>
-        <li><b>2020</b><span>HARMAN · Navigation &amp; ADAS</span></li>
-        <li class="is-reroute"><b>2025</b><span>Reroute · Engineering → Product</span></li>
-        <li><b>2025</b><span>Duke · Engineering Management</span></li>
-        <li><b>2026</b><span>PointsMax · Solo founder</span></li>
-        <li class="is-dest"><b>2027</b><span>Your team?</span></li>
-      </ul>
-      <div class="routecard__foot">
-        <div><b>10</b><span>years</span></div>
-        <div><b>2</b><span>countries</span></div>
-        <div><b>1</b><span>reroute</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ STOP 1: ORIGIN ============ -->
-  <section class="stop stop--left" id="origin" data-maneuver="Start at IIIT Delhi" data-year="2016.6" data-short="IIIT Delhi">
-    <span class="stop__pin"></span>
-    <div class="stop__body">
-      <p class="eyebrow">Aug 2016 – May 2020 · New Delhi</p>
-      <h2>Two lenses from day one.</h2>
-      <p>B.Tech in Electronics &amp; Communication Engineering at IIIT Delhi, with a minor in Economics. Signal processing on one side of the timetable; game theory, econometrics and microeconomics on the other.</p>
-      <p class="aside">That pairing still shapes how I work: how does the system behave, and why would anyone choose it?</p>
-    </div>
-  </section>
-
-  <!-- ============ STOP 2: HARMAN ENGINEER ============ -->
-  <section class="stop stop--right" id="harman" data-maneuver="Merge onto HARMAN" data-year="2020.8" data-short="HARMAN">
-    <span class="stop__pin"></span>
-    <div class="stop__body">
-      <p class="eyebrow">Oct 2020 – Mar 2023 · Bengaluru · Associate Software Engineer</p>
-      <h2>Navigation and ADAS for trucks and cars on three continents.</h2>
-      <p>Location-Based Services at HARMAN (a Samsung company): the software that knows the road, the speed limit and what&rsquo;s around the next bend.</p>
-
-      <div class="event event--demo">
-        <div class="event__head">
-          <span class="sign sign--info" aria-hidden="true">i</span>
-          <h3>The camera goes blind. The map doesn&rsquo;t.</h3>
+    <section class="hero stop" data-sky="dawn" data-maneuver="Head out from New Delhi" data-year="2016.6" data-short="Start">
+      <span class="stop__pin"></span>
+      <div class="hero__copy">
+        <p class="eyebrow">Route · New Delhi → Bengaluru → Durham → <span class="blink">?</span></p>
+        <h1 class="hero__title">I built the software that tells cars what&rsquo;s ahead.<span>Now I build products.</span></h1>
+        <p class="hero__lede">I&rsquo;m Aditya Aggarwal. I spent five years at HARMAN shipping navigation and driver-assist features for Audi, BMW, MAN and Daimler. Today I&rsquo;m at Duke studying engineering management and building PointsMax. Scroll to take the drive.</p>
+        <div class="hero__ctas">
+          <a href="#origin" class="btn btn--go">Start the drive <span aria-hidden="true">↓</span></a>
+          <button type="button" class="btn btn--ghost" data-film><span aria-hidden="true">▶</span> Watch the 80-second film</button>
         </div>
-        <p>For MAN trucks across the EU, I delivered Traffic Sign Information: sign data from the map, fed into HARMAN&rsquo;s platform and exposed via API, so the truck still knows the limit when its camera can&rsquo;t see. Try it.</p>
-        <div class="tsi" id="tsi">
-          <div class="tsi__controls">
-            <button type="button" class="toggle" id="tsi-camera" aria-pressed="true">Camera <b>ON</b></button>
-            <button type="button" class="toggle" id="tsi-feature" aria-pressed="true">Map fallback <b>AFTER</b></button>
+        <button type="button" class="hero__hurry" data-express>In a hurry? Take the express lane →</button>
+      </div>
+
+      <div class="routecard" aria-label="Route overview">
+        <div class="routecard__head">
+          <span class="hud-label">Route overview</span>
+          <span class="routecard__status" id="calc">Calculating…</span>
+        </div>
+        <ul class="routecard__legs">
+          <li><b>2016</b><span>IIIT Delhi · ECE + Economics</span></li>
+          <li><b>2020</b><span>HARMAN · Navigation &amp; ADAS</span></li>
+          <li class="is-reroute"><b>2025</b><span>Reroute · Engineering → Product</span></li>
+          <li><b>2025</b><span>Wheels up · Bengaluru → Durham</span></li>
+          <li><b>2025</b><span>Duke · Engineering Management</span></li>
+          <li><b>2026</b><span>PointsMax · Solo founder</span></li>
+          <li class="is-dest"><b>2027</b><span>Your team?</span></li>
+        </ul>
+        <div class="routecard__foot">
+          <div><b>10</b><span>years</span></div>
+          <div><b>14,000</b><span>km flown</span></div>
+          <div><b>1</b><span>reroute</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stop stop--left" id="origin" data-sky="dawn" data-maneuver="Start at IIIT Delhi" data-year="2016.6" data-short="IIIT Delhi">
+      <span class="stop__pin"></span>
+      <div class="stop__body">
+        <p class="eyebrow">Aug 2016 – May 2020 · New Delhi</p>
+        <h2>Math, science, and money.</h2>
+        <p>I was always the analytical one. I loved math and science, and building fun things with them, so engineering was the obvious road: a B.Tech in Electronics &amp; Communication at IIIT Delhi.</p>
+        <p>But I also loved the business side. I liked investing, and I wanted to understand how money moves and how the world actually runs. So I added a minor in Economics: game theory, econometrics, finance.</p>
+      </div>
+      <svg class="landmark" viewBox="0 0 320 320" aria-hidden="true">
+        <!-- India Gate -->
+        <path d="M20 320 V140 H180 V320 H132 V200 Q100 160 68 200 V320 Z"/>
+        <rect x="8" y="118" width="184" height="24"/><rect x="40" y="100" width="120" height="20"/><rect x="82" y="84" width="36" height="18"/>
+        <!-- Qutub Minar -->
+        <path d="M232 320 L247 40 L265 40 L280 320 Z"/>
+        <rect x="236" y="120" width="40" height="8"/><rect x="232" y="200" width="48" height="8"/><rect x="240" y="40" width="32" height="8"/><rect x="250" y="20" width="12" height="22"/>
+      </svg>
+    </section>
+  </div>
+
+  <!-- ===================== BENGALURU ===================== -->
+  <div class="region" data-city="bengaluru">
+    <canvas class="region__map" aria-hidden="true"></canvas>
+
+    <section class="stop stop--right sky-light" id="harman" data-sky="day" data-maneuver="Merge onto HARMAN" data-year="2020.8" data-short="HARMAN">
+      <span class="stop__pin"></span>
+      <div class="stop__body">
+        <p class="eyebrow">Oct 2020 – Mar 2023 · Bengaluru · Associate Software Engineer</p>
+        <h2>Navigation and ADAS for trucks and cars on three continents.</h2>
+        <p>Location-Based Services at HARMAN (a Samsung company): the software that knows the road, the speed limit and what&rsquo;s around the next bend.</p>
+
+        <div class="event event--demo">
+          <div class="event__head">
+            <span class="sign sign--info" aria-hidden="true">i</span>
+            <h3>The camera goes blind. The map doesn&rsquo;t.</h3>
           </div>
-          <div class="tsi__road" id="tsi-road" aria-hidden="true"></div>
-          <p class="tsi__readout"><b id="tsi-pct">100%</b> <span id="tsi-caption">of signs known · camera sees them all</span></p>
+          <p>For MAN trucks across the EU, I delivered Traffic Sign Information: sign data from the map, fed into HARMAN&rsquo;s platform and exposed via API, so the truck still knows the limit when its camera can&rsquo;t see. Try it.</p>
+          <div class="tsi" id="tsi">
+            <div class="tsi__controls">
+              <button type="button" class="toggle" id="tsi-camera" aria-pressed="true">Camera <b>ON</b></button>
+              <button type="button" class="toggle" id="tsi-feature" aria-pressed="true">Map fallback <b>AFTER</b></button>
+            </div>
+            <div class="tsi__road" id="tsi-road" aria-hidden="true"></div>
+            <p class="tsi__readout"><b id="tsi-pct">100%</b> <span id="tsi-caption">of signs known · camera sees them all</span></p>
+          </div>
+        </div>
+
+        <div class="event">
+          <div class="event__head">
+            <span class="sign sign--warn" aria-hidden="true">!</span>
+            <h3>The watchdog that kept biting.</h3>
+          </div>
+          <p>Field crashes were slow to trace, so I wrote a Python tool that parses ADAS logs automatically. It led us to a critical watchdog-timer bug. Fixing it cut crash frequency by <b class="hl">50%</b>.</p>
+        </div>
+
+        <div class="event">
+          <div class="event__head">
+            <span class="sign sign--closed" aria-hidden="true"></span>
+            <h3>$500K secured. Then: road closed.</h3>
+          </div>
+          <p>I led a six-week proof of concept for an Intelligent Speed Assistance protocol suite, tied to the EU ISA mandate. My feasibility and build-vs-partner analysis won <b class="hl">$500K</b> in development funding. Then OEM timelines shifted and the program was shelved. Good analysis doesn&rsquo;t guarantee the road stays open.</p>
         </div>
       </div>
+      <svg class="landmark" viewBox="0 0 360 320" aria-hidden="true">
+        <!-- Bengaluru towers -->
+        <rect x="10" y="90" width="56" height="150"/><rect x="74" y="40" width="64" height="200"/><rect x="146" y="120" width="48" height="120"/><rect x="202" y="70" width="70" height="170"/><rect x="280" y="140" width="60" height="100"/>
+        <!-- MAN truck -->
+        <rect x="40" y="250" width="200" height="46" rx="4"/><path d="M246 296 V258 Q246 246 258 246 H290 Q302 246 308 262 L318 280 V296 Z"/>
+        <circle cx="80" cy="302" r="14" class="landmark__hole"/><circle cx="200" cy="302" r="14" class="landmark__hole"/><circle cx="288" cy="302" r="14" class="landmark__hole"/>
+      </svg>
+    </section>
 
-      <div class="event">
-        <div class="event__head">
-          <span class="sign sign--warn" aria-hidden="true">!</span>
-          <h3>The watchdog that kept biting.</h3>
+    <section class="stop stop--left sky-light" id="product-engineer" data-sky="golden" data-maneuver="Continue as Product Engineer" data-year="2023.2" data-short="Product Engineer">
+      <span class="stop__pin"></span>
+      <div class="stop__body">
+        <p class="eyebrow">Mar 2023 – Jul 2025 · Bengaluru · Product Engineer</p>
+        <h2>Less code, more calls about what ships.</h2>
+        <p>I owned cross-functional delivery for an augmented-reality navigation feature for global OEM customers, aligning teams in the US, EU and India on requirements, API dependencies and release scope.</p>
+
+        <div class="cluster" aria-label="Results as Product Engineer">
+          <div class="gauge" data-from="28" data-to="38">
+            <svg viewBox="0 0 120 70" aria-hidden="true">
+              <path class="gauge__track" d="M10 64 A50 50 0 0 1 110 64" />
+              <path class="gauge__fill" d="M10 64 A50 50 0 0 1 110 64" />
+            </svg>
+            <span class="gauge__val">38</span>
+            <span class="gauge__label">Sprint velocity, up from 28. I built the Python KPI dashboards that made it visible.</span>
+          </div>
+          <div class="dial">
+            <span class="dial__val">95%</span>
+            <span class="dial__label">Sprint commitments delivered across 24 sprints</span>
+          </div>
+          <div class="dial">
+            <span class="dial__val">−4 mo</span>
+            <span class="dial__label">Release cycle, after I moved FTP releases to Jenkins CI/CD</span>
+          </div>
+          <div class="dial">
+            <span class="dial__val">5 × 3</span>
+            <span class="dial__label">Audi ADAS change requests sequenced across 3 markets</span>
+          </div>
         </div>
-        <p>Field crashes were slow to trace, so I wrote a Python tool that parses ADAS logs automatically. It led us to a critical watchdog-timer bug. Fixing it cut crash frequency by <b class="hl">50%</b>.</p>
+
+        <p>On Audi&rsquo;s global ADAS program, the hard part was the tradeoff: keep legacy OEM commitments, or invest in E-Horizon, a next-generation Android navigation architecture. I sequenced the work against regulatory deadlines and engineering capacity so each release stayed on schedule.</p>
+        <p class="aside">E-Horizon uses map data to let a car see past the next curve. The &ldquo;Then&rdquo; list in the bar at the top of this page does the same thing for the drive.</p>
       </div>
+      <svg class="landmark" viewBox="0 0 320 280" aria-hidden="true">
+        <!-- golden hour over the highway -->
+        <path d="M60 150 A100 100 0 0 1 260 150 Z"/>
+        <rect x="0" y="150" width="320" height="4"/>
+        <path d="M150 154 L170 154 L250 280 L70 280 Z" class="landmark__soft"/>
+        <rect x="157" y="170" width="6" height="16"/><rect x="156" y="200" width="8" height="22"/><rect x="155" y="238" width="10" height="30"/>
+      </svg>
+    </section>
+  </div>
 
-      <div class="event">
-        <div class="event__head">
-          <span class="sign sign--closed" aria-hidden="true"></span>
-          <h3>$500K secured. Then: road closed.</h3>
-        </div>
-        <p>I led a six-week proof of concept for an Intelligent Speed Assistance protocol suite, tied to the EU ISA mandate. My feasibility and build-vs-partner analysis won <b class="hl">$500K</b> in development funding. Then OEM timelines shifted and the program was shelved. Good analysis doesn&rsquo;t guarantee the road stays open.</p>
+  <!-- ===================== THE TURN + FLIGHT ===================== -->
+  <div class="region" data-city="ocean">
+    <canvas class="region__map" aria-hidden="true"></canvas>
+
+    <section class="stop stop--full reroute" id="reroute" data-sky="dusk" data-maneuver="Recalculating route" data-year="2025.4" data-short="Reroute">
+      <span class="stop__pin"></span>
+      <div class="reroute__inner">
+        <span class="reroute__badge"><span class="pulse"></span> Recalculating</span>
+        <h2 class="reroute__title">New route:<br><span>Engineering</span> <em>→</em> Product</h2>
+        <p class="reroute__story">At HARMAN I often had a business opinion, or a doubt. But engineers are handed tasks, not a vote. I watched a lot of effort go into decisions that didn&rsquo;t make business sense, built only because they were on the plan.</p>
+        <p class="reroute__story">I wanted to help decide <em>what</em> gets built, not only <em>how</em>.</p>
+        <blockquote>&ldquo;I&rsquo;m drawn to products where the complexity underneath makes something feel effortless above.&rdquo;</blockquote>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ============ STOP 3: PRODUCT ENGINEER ============ -->
-  <section class="stop stop--left" id="product-engineer" data-maneuver="Continue as Product Engineer" data-year="2023.2" data-short="Product Engineer">
-    <span class="stop__pin"></span>
-    <div class="stop__body">
-      <p class="eyebrow">Mar 2023 – Jul 2025 · Bengaluru · Product Engineer</p>
-      <h2>Less code, more calls about what ships.</h2>
-      <p>I owned cross-functional delivery for an augmented-reality navigation feature for global OEM customers, aligning teams in the US, EU and India on requirements, API dependencies and release scope.</p>
-
-      <div class="cluster" aria-label="Results as Product Engineer">
-        <div class="gauge" data-from="28" data-to="38">
-          <svg viewBox="0 0 120 70" aria-hidden="true">
-            <path class="gauge__track" d="M10 64 A50 50 0 0 1 110 64" />
-            <path class="gauge__fill" d="M10 64 A50 50 0 0 1 110 64" />
-          </svg>
-          <span class="gauge__val">38</span>
-          <span class="gauge__label">Sprint velocity, up from 28. I built the Python KPI dashboards that made it visible.</span>
-        </div>
-        <div class="dial">
-          <span class="dial__val">95%</span>
-          <span class="dial__label">Sprint commitments delivered across 24 sprints</span>
-        </div>
-        <div class="dial">
-          <span class="dial__val">−4 mo</span>
-          <span class="dial__label">Release cycle, after I moved FTP releases to Jenkins CI/CD</span>
-        </div>
-        <div class="dial">
-          <span class="dial__val">5 × 3</span>
-          <span class="dial__label">Audi ADAS change requests sequenced across 3 markets</span>
-        </div>
-      </div>
-
-      <p>On Audi&rsquo;s global ADAS program, the hard part was the tradeoff: keep legacy OEM commitments, or invest in E-Horizon, a next-generation Android navigation architecture. I sequenced the work against regulatory deadlines and engineering capacity so each release stayed on schedule.</p>
-      <p class="aside">E-Horizon uses map data to let a car see past the next curve. The &ldquo;Then&rdquo; list in the bar at the top of this page does the same thing for the drive.</p>
-    </div>
-  </section>
-
-  <!-- ============ STOP 4: REROUTE ============ -->
-  <section class="stop stop--full reroute" id="reroute" data-maneuver="Recalculating route" data-year="2025.5" data-short="Reroute">
-    <span class="stop__pin" data-side="center"></span>
-    <div class="reroute__inner">
-      <span class="reroute__badge"><span class="pulse"></span> Recalculating</span>
-      <h2 class="reroute__title">New route:<br><span>Engineering</span> <em>→</em> Product</h2>
-      <blockquote>&ldquo;I&rsquo;m drawn to products where the complexity underneath makes something feel effortless above.&rdquo;</blockquote>
-      <p>Five years of making hard systems feel simple to drivers. The next step was to own the decisions about what gets built and why.</p>
-    </div>
-  </section>
-
-  <!-- ============ STOP 5: DUKE ============ -->
-  <section class="stop stop--right" id="duke" data-maneuver="Arrive at Duke University" data-year="2025.65" data-short="Duke">
-    <span class="stop__pin"></span>
-    <div class="stop__body">
-      <p class="eyebrow">Aug 2025 – Dec 2026 · Durham, NC · Master of Engineering Management</p>
-      <h2>Learning the business side of the map.</h2>
-      <p><b class="hl">3.92 GPA.</b> Coursework in competitive strategy, digital transformation, AI and the future of work, marketing, finance, and design thinking. Teaching assistant for graduate Marketing in Spring 2026.</p>
-
-      <div class="event">
-        <div class="event__head"><span class="sign sign--info" aria-hidden="true">?</span><h3>ForOurLastNames: the barrier was trust.</h3></div>
-        <p>As a student consultant I ran 15+ jobs-to-be-done interviews. People didn&rsquo;t lack information; they lacked trust. Referrals from people they already knew made them comfortable trying something new. That moved the product from a pure tech tool toward a trust-based referral model. I turned the research into personas and journey maps in Figma.</p>
-      </div>
-
-      <a class="event event--link" href="./assets/PayPal_Strategy.pdf" target="_blank" rel="noopener">
-        <div class="event__head"><span class="sign sign--info" aria-hidden="true">→</span><h3>Can PayPal stop being a button and become the brain of global money?</h3></div>
-        <p>An 11-page competitive strategy: four possible futures for payments, PayPal&rsquo;s four-front war with Apple, Google, the banks and Stripe, and a three-step plan to defend checkout, win on B2B payouts and stablecoins, then become a multi-rail Super Wallet.</p>
-        <span class="event__cta">Read the strategy (PDF) ↗</span>
-      </a>
-    </div>
-  </section>
-
-  <!-- ============ STOP 6: POINTSMAX ============ -->
-  <section class="stop stop--left" id="pointsmax" data-maneuver="Build PointsMax" data-year="2026.0" data-short="PointsMax">
-    <span class="stop__pin"></span>
-    <div class="stop__body">
-      <p class="eyebrow">Jan 2026 – now · Solo founder</p>
-      <h2>PointsMax: navigation for your points.</h2>
-      <p>Frequent travelers in India and the US juggle five to eight loyalty programs, with no tool to tell them what a redemption is worth at the moment they book. Points sit unused or get spent badly.</p>
-      <p>I built the beta from zero on my own: user research, product design, onboarding, backend architecture and the AI recommendation workflow that suggests how to redeem.</p>
-      <div class="pm" aria-hidden="true">
-        <div class="pm__node">Card points</div>
-        <div class="pm__node">Airline miles</div>
-        <div class="pm__node">Hotel points</div>
-        <div class="pm__node pm__node--best">Best redemption</div>
-      </div>
-      <div class="statrow">
-        <div><b>0 → 1</b><span>built solo</span></div>
-        <div><b>10+</b><span>beta testers</span></div>
-        <div><b>5–8</b><span>programs per traveler</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ STOP 7: SIDE ROADS ============ -->
-  <section class="stop stop--right" id="side-roads" data-maneuver="Scenic detour: side roads" data-year="2026.4" data-short="Side roads">
-    <span class="stop__pin"></span>
-    <div class="stop__body">
-      <p class="eyebrow">Off the main road</p>
-      <h2>Side roads.</h2>
-      <div class="sides">
-        <div class="side">
-          <span class="side__val"><span class="count" data-from="1000" data-to="1800">1800</span></span>
-          <span class="side__label">Chess Elo, up from 1000 through deliberate study</span>
-        </div>
-        <div class="side">
-          <span class="side__val">20+</span>
-          <span class="side__label">Students mentored in math and science with Shanti Sahyog</span>
+    <section class="stop stop--left flight" id="flight" data-sky="dusk" data-maneuver="Take off for Durham" data-year="2025.55" data-short="Flight">
+      <span class="stop__pin"></span>
+      <div class="stop__body">
+        <p class="eyebrow">Aug 2025 · BLR → RDU · about 14,000 km</p>
+        <h2>Wheels up.</h2>
+        <p>The US is at the forefront of AI, and I wanted to be where it&rsquo;s being built.</p>
+        <div class="boarding" aria-label="Boarding pass">
+          <div><span class="hud-label">From</span><b>BLR</b><span>Bengaluru</span></div>
+          <div class="boarding__plane" aria-hidden="true">✈</div>
+          <div><span class="hud-label">To</span><b>RDU</b><span>Raleigh–Durham</span></div>
+          <div class="boarding__row"><span class="hud-label">Passenger</span> AGGARWAL/ADITYA <span class="hud-label">Class</span> MEM ’26</div>
         </div>
       </div>
-      <h3 class="sub">Fingenuous, my finance blog</h3>
-      <ul class="posts">
-        <li><a href="https://fingenuous.wixsite.com/fingenuous/post/what-does-p-e-ratio-really-mean" target="_blank" rel="noopener">What does the P/E ratio really mean? <span aria-hidden="true">↗</span></a></li>
-        <li><a href="https://fingenuous.wixsite.com/fingenuous/post/crypto-everything-you-need-to-know" target="_blank" rel="noopener">Crypto: everything you need to know <span aria-hidden="true">↗</span></a></li>
-        <li><a href="https://fingenuous.wixsite.com/fingenuous/post/why-your-indian-mutual-fund-probably-underperforms-its-benchmark" target="_blank" rel="noopener">Why your Indian mutual fund probably underperforms its benchmark <span aria-hidden="true">↗</span></a></li>
-      </ul>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <!-- ============ DESTINATION ============ -->
-  <section class="stop stop--full dest" id="destination" data-maneuver="Destination: your team" data-year="2026.9" data-short="Destination">
-    <span class="stop__pin" data-side="center"></span>
-    <div class="dest__inner">
-      <span class="dest__flag" aria-hidden="true"></span>
-      <p class="eyebrow">Destination</p>
-      <h2 class="dest__title">Your team?</h2>
-      <p class="dest__eta"><span class="hud-label">ETA</span> Graduating December 2026 · open to PM and TPM roles</p>
-      <div class="dest__email">
-        <span id="email">aditya.aggarwal@duke.edu</span>
-        <button type="button" class="btn btn--go" id="copy-email">Copy email</button>
+  <!-- ===================== DURHAM ===================== -->
+  <div class="region" data-city="durham">
+    <canvas class="region__map" aria-hidden="true"></canvas>
+
+    <section class="stop stop--right" id="duke" data-sky="night" data-maneuver="Arrive at Duke University" data-year="2025.65" data-short="Duke">
+      <span class="stop__pin"></span>
+      <div class="stop__body">
+        <p class="eyebrow">Aug 2025 – Dec 2026 · Durham, NC · Master of Engineering Management</p>
+        <h2>Learning the business side of the map.</h2>
+        <p>Engineering management takes management skills and points them at engineering and high tech, which is exactly where I wanted to sharpen. <b class="hl">3.92 GPA</b> so far, with coursework in competitive strategy, digital transformation, AI and the future of work, marketing, finance, and design thinking. Teaching assistant for graduate Marketing in Spring 2026.</p>
+
+        <div class="event">
+          <div class="event__head"><span class="sign sign--info" aria-hidden="true">?</span><h3>ForOurLastNames: the barrier was trust.</h3></div>
+          <p>As a student consultant I ran 15+ jobs-to-be-done interviews. People didn&rsquo;t lack information; they lacked trust. Referrals from people they already knew made them comfortable trying something new. That moved the product from a pure tech tool toward a trust-based referral model. I turned the research into personas and journey maps in Figma.</p>
+        </div>
+
+        <a class="event event--link" href="./assets/PayPal_Strategy.pdf" target="_blank" rel="noopener">
+          <div class="event__head"><span class="sign sign--info" aria-hidden="true">→</span><h3>Can PayPal stop being a button and become the brain of global money?</h3></div>
+          <p>An 11-page competitive strategy: four possible futures for payments, PayPal&rsquo;s four-front war with Apple, Google, the banks and Stripe, and a three-step plan to defend checkout, win on B2B payouts and stablecoins, then become a multi-rail Super Wallet.</p>
+          <span class="event__cta">Read the strategy (PDF) ↗</span>
+        </a>
       </div>
-      <ul class="dest__links">
-        <li><a href="https://www.linkedin.com/in/adityaxaggarwal" target="_blank" rel="noopener">LinkedIn ↗</a></li>
-        <li><a href="https://github.com/dosbenq" target="_blank" rel="noopener">GitHub ↗</a></li>
-        <li><a href="./assets/Aditya_Aggarwal_Resume.pdf" target="_blank" rel="noopener">Resume (PDF) ↗</a></li>
-      </ul>
-    </div>
-  </section>
+      <svg class="landmark" viewBox="0 0 260 360" aria-hidden="true">
+        <!-- Duke Chapel -->
+        <path d="M10 360 V250 L60 214 L110 250 V360 Z"/><path d="M150 360 V250 L200 214 L250 250 V360 Z"/>
+        <rect x="96" y="96" width="68" height="264"/>
+        <path d="M96 96 L130 30 L164 96 Z"/>
+        <path d="M90 100 L96 70 L102 100 Z"/><path d="M158 100 L164 70 L170 100 Z"/>
+        <path d="M118 200 V170 Q130 152 142 170 V200 Z" class="landmark__hole"/>
+        <path d="M120 300 V262 Q130 246 140 262 V300 Z" class="landmark__hole"/>
+        <rect x="128" y="10" width="4" height="24"/>
+      </svg>
+    </section>
+
+    <section class="stop stop--left" id="pointsmax" data-sky="night" data-maneuver="Build PointsMax" data-year="2026.0" data-short="PointsMax">
+      <span class="stop__pin"></span>
+      <div class="stop__body">
+        <p class="eyebrow">Jan 2026 – now · Solo founder</p>
+        <h2>PointsMax: navigation for your points.</h2>
+        <p>Credit card points and deal-hunting are my side passion. I kept noticing how skewed hotel and airline loyalty can be: you pay full price and still don&rsquo;t get the privileges the program promises.</p>
+        <p>I was optimizing all of it by hand. I searched everywhere for a tool that did it for me and found nothing; everyone still does it manually. So I built one. PointsMax helps travelers who juggle five to eight loyalty programs see what a redemption is really worth at the moment they book.</p>
+        <p>I built the beta from zero on my own: user research, product design, onboarding, backend architecture and the AI recommendation workflow.</p>
+        <div class="pm" aria-hidden="true">
+          <div class="pm__node">Card points</div>
+          <div class="pm__node">Airline miles</div>
+          <div class="pm__node">Hotel points</div>
+          <div class="pm__node pm__node--best">Best redemption</div>
+        </div>
+        <div class="statrow">
+          <div><b>0 → 1</b><span>built solo</span></div>
+          <div><b>10+</b><span>beta testers</span></div>
+          <div><b>5–8</b><span>programs per traveler</span></div>
+        </div>
+      </div>
+      <svg class="landmark" viewBox="0 0 320 300" aria-hidden="true">
+        <!-- a card, a plane and a hotel joined by one route -->
+        <rect x="10" y="200" width="110" height="70" rx="10"/><rect x="24" y="222" width="22" height="16" rx="3" class="landmark__hole"/>
+        <path d="M150 40 l60 24 l-10 6 l-24 -6 l-16 20 l-8 0 l8 -24 l-22 -8 l-6 6 l-6 0 l4 -14 z" transform="translate(20 0)"/>
+        <rect x="220" y="170" width="80" height="110"/><rect x="236" y="186" width="14" height="14" class="landmark__hole"/><rect x="268" y="186" width="14" height="14" class="landmark__hole"/><rect x="236" y="214" width="14" height="14" class="landmark__hole"/><rect x="268" y="214" width="14" height="14" class="landmark__hole"/><rect x="250" y="250" width="20" height="30" class="landmark__hole"/>
+        <path d="M70 196 C90 120 150 120 190 80 M230 100 C270 120 280 140 262 166" class="landmark__route"/>
+      </svg>
+    </section>
+
+    <section class="stop stop--right" id="side-roads" data-sky="night" data-maneuver="Scenic detour: side roads" data-year="2026.4" data-short="Side roads">
+      <span class="stop__pin"></span>
+      <div class="stop__body">
+        <p class="eyebrow">Off the main road</p>
+        <h2>Side roads.</h2>
+        <div class="sides">
+          <div class="side">
+            <span class="side__val"><span class="count" data-from="1000" data-to="1800">1800</span></span>
+            <span class="side__label">Chess Elo, up from 1000 through deliberate study</span>
+          </div>
+          <div class="side">
+            <span class="side__val">20+</span>
+            <span class="side__label">Students mentored in math and science with Shanti Sahyog</span>
+          </div>
+        </div>
+        <h3 class="sub">Fingenuous, my finance blog</h3>
+        <ul class="posts">
+          <li><a href="https://fingenuous.wixsite.com/fingenuous/post/what-does-p-e-ratio-really-mean" target="_blank" rel="noopener">What does the P/E ratio really mean? <span aria-hidden="true">↗</span></a></li>
+          <li><a href="https://fingenuous.wixsite.com/fingenuous/post/crypto-everything-you-need-to-know" target="_blank" rel="noopener">Crypto: everything you need to know <span aria-hidden="true">↗</span></a></li>
+          <li><a href="https://fingenuous.wixsite.com/fingenuous/post/why-your-indian-mutual-fund-probably-underperforms-its-benchmark" target="_blank" rel="noopener">Why your Indian mutual fund probably underperforms its benchmark <span aria-hidden="true">↗</span></a></li>
+        </ul>
+      </div>
+      <svg class="landmark landmark--small" viewBox="0 0 140 180" aria-hidden="true">
+        <!-- chess knight -->
+        <path d="M30 168 H110 V150 H100 C104 120 112 96 106 72 C100 44 78 24 54 22 L50 8 L40 24 C28 30 20 44 16 60 L8 80 C6 90 16 96 26 90 L38 82 C46 80 52 78 58 74 C54 96 40 112 36 130 L36 150 H30 Z"/>
+        <circle cx="46" cy="44" r="4" class="landmark__hole"/>
+      </svg>
+    </section>
+
+    <section class="stop stop--full dest" id="destination" data-sky="sunrise" data-maneuver="Destination: your team" data-year="2026.9" data-short="Destination">
+      <span class="stop__pin"></span>
+      <div class="dest__inner">
+        <span class="dest__flag" aria-hidden="true"></span>
+        <p class="eyebrow">Destination</p>
+        <h2 class="dest__title">Your team?</h2>
+        <p class="dest__pitch">I&rsquo;m looking for a team that moves fast, has fun, and makes a real dent. Bring the destination; I&rsquo;ll help find the route.</p>
+        <p class="dest__eta"><span class="hud-label">ETA</span> Graduating December 2026</p>
+        <div class="dest__email">
+          <span id="email">aditya.aggarwal@duke.edu</span>
+          <button type="button" class="btn btn--go" id="copy-email">Copy email</button>
+        </div>
+        <ul class="dest__links">
+          <li><a href="https://www.linkedin.com/in/adityaxaggarwal" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+          <li><a href="https://github.com/dosbenq" target="_blank" rel="noopener">GitHub ↗</a></li>
+          <li><a href="./assets/Aditya_Aggarwal_Resume.pdf" target="_blank" rel="noopener">Resume (PDF) ↗</a></li>
+        </ul>
+      </div>
+    </section>
+  </div>
 
 </main>
 
