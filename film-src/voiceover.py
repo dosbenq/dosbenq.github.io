@@ -11,7 +11,9 @@ import numpy as np
 from scipy import signal
 from kokoro_onnx import Kokoro
 
-VOICE = 'am_michael'
+# Michael, optionally blended with Kokoro's Hindi male voice for a light
+# Indian-American accent: {voice name: weight}
+VOICE = {'am_michael': 1.0}
 SR = 44100
 DUR = 94.5
 
@@ -31,8 +33,8 @@ LINES = [
     (None, "And a lot of effort went into things that just didn't make business sense.", "A lot of effort went into things|that just didn't make business sense.", 40.5),
     (41.0, "I wanted to help decide what gets built, not just how.", "I wanted to help decide what gets built,|not just how.", 48.0),
     (44.4, "So, I recalculated.", "So: I recalculated.", 48.0),
-    (48.7, "In twenty twenty-five, I moved to the U.S.", "In 2025, I moved to the US.", 55.0),
-    (None, "It's where A.I. is being built, and I wanted to be there.", "It's where AI is being built,|and I wanted to be there.", 55.6),
+    (48.7, "In twenty twenty-five, I moved to the US.", "In 2025, I moved to the US.", 55.0),
+    (None, "It's where AI is being built, and I wanted to be there.", "It's where AI is being built,|and I wanted to be there.", 55.6),
     (55.8, "At Duke, I picked up the business side. Strategy, finance, marketing.", "At Duke, I picked up the business side:|strategy, finance, marketing.", 72.5),
     (61.0, "Design Thinking taught me how to really interview customers.", "Design Thinking taught me|how to really interview customers.", 72.5),
     (None, "After fifteen-plus interviews, the lesson was simple.", "After 15+ interviews, the lesson was simple.", 72.5),
@@ -50,11 +52,12 @@ SPEED = 1.05
 
 def main(model_dir, out_wav, out_json):
     kokoro = Kokoro(f'{model_dir}/kokoro-v1.0.onnx', f'{model_dir}/voices-v1.0.bin')
+    style = sum(w * kokoro.get_voice_style(name) for name, w in VOICE.items())
     track = np.zeros(int(DUR * SR))
     timing = []
     cursor = 0.0
     for anchor, spoken, caption, scene_end in LINES:
-        samples, sr = kokoro.create(spoken, voice=VOICE, speed=SPEED, lang='en-us')
+        samples, sr = kokoro.create(spoken, voice=style, speed=SPEED, lang='en-us')
         audio = signal.resample_poly(samples, SR, sr)
         # trim leading/trailing silence so the gaps are ours, not the model's
         level = np.abs(audio) > 0.01
