@@ -1,0 +1,1540 @@
+[
+ {
+  "segment": 0,
+  "start": 1.08,
+  "end": 6.57,
+  "captions": [
+   [
+    0,
+    "Hey, I'm Aditya."
+   ],
+   [
+    3,
+    "Let me tell you how I got here."
+   ],
+   [
+    11,
+    "It's been the long way round."
+   ]
+  ],
+  "beats": {},
+  "words": [
+   [
+    "hey",
+    1.13,
+    1.41
+   ],
+   [
+    "i'm",
+    1.62,
+    2.02
+   ],
+   [
+    "aditya",
+    2.02,
+    2.5
+   ],
+   [
+    "let",
+    3.12,
+    3.3
+   ],
+   [
+    "me",
+    3.3,
+    3.4
+   ],
+   [
+    "tell",
+    3.4,
+    3.56
+   ],
+   [
+    "you",
+    3.56,
+    3.79
+   ],
+   [
+    "how",
+    3.79,
+    3.95
+   ],
+   [
+    "i",
+    3.95,
+    4.03
+   ],
+   [
+    "got",
+    4.03,
+    4.28
+   ],
+   [
+    "here",
+    4.28,
+    4.54
+   ],
+   [
+    "it's",
+    4.96,
+    5.11
+   ],
+   [
+    "been",
+    5.11,
+    5.34
+   ],
+   [
+    "the",
+    5.34,
+    5.47
+   ],
+   [
+    "long",
+    5.47,
+    5.72
+   ],
+   [
+    "way",
+    5.72,
+    5.97
+   ],
+   [
+    "round",
+    5.97,
+    6.57
+   ]
+  ],
+  "scene": "title"
+ },
+ {
+  "segment": 1,
+  "start": 7.97,
+  "end": 12.39,
+  "captions": [
+   [
+    0,
+    "I was always the analytical kid.|Math, science, building fun stuff."
+   ]
+  ],
+  "beats": {},
+  "words": [
+   [
+    "i",
+    7.97,
+    8.04
+   ],
+   [
+    "was",
+    8.04,
+    8.29
+   ],
+   [
+    "always",
+    8.29,
+    8.72
+   ],
+   [
+    "the",
+    8.72,
+    8.89
+   ],
+   [
+    "analytical",
+    8.89,
+    9.48
+   ],
+   [
+    "kid",
+    9.48,
+    10.09
+   ],
+   [
+    "math",
+    10.09,
+    10.64
+   ],
+   [
+    "science",
+    10.64,
+    11.17
+   ],
+   [
+    "building",
+    11.17,
+    11.56
+   ],
+   [
+    "fun",
+    11.56,
+    11.78
+   ],
+   [
+    "stuff",
+    11.78,
+    12.39
+   ]
+  ],
+  "scene": "delhi"
+ },
+ {
+  "segment": 2,
+  "start": 12.69,
+  "end": 13.82,
+  "captions": [
+   [
+    0,
+    "So: engineering."
+   ]
+  ],
+  "beats": {},
+  "words": [
+   [
+    "so",
+    12.69,
+    13.16
+   ],
+   [
+    "engineering",
+    13.16,
+    13.74
+   ]
+  ],
+  "scene": "delhi"
+ },
+ {
+  "segment": 4,
+  "start": 17.99,
+  "end": 23.81,
+  "captions": [
+   [
+    0,
+    "But I also loved investing,|and how money moves the world."
+   ],
+   [
+    11,
+    "So I added economics."
+   ]
+  ],
+  "beats": {
+   "delhiEcon": 4
+  },
+  "words": [
+   [
+    "but",
+    17.99,
+    18.73
+   ],
+   [
+    "i",
+    18.73,
+    18.88
+   ],
+   [
+    "also",
+    18.88,
+    19.22
+   ],
+   [
+    "loved",
+    19.22,
+    19.42
+   ],
+   [
+    "investing",
+    19.42,
+    20.11
+   ],
+   [
+    "and",
+    20.11,
+    20.29
+   ],
+   [
+    "how",
+    20.29,
+    20.45
+   ],
+   [
+    "money",
+    20.45,
+    20.73
+   ],
+   [
+    "moves",
+    20.73,
+    20.98
+   ],
+   [
+    "the",
+    20.98,
+    21.07
+   ],
+   [
+    "world",
+    21.07,
+    21.43
+   ],
+   [
+    "so",
+    21.86,
+    22.11
+   ],
+   [
+    "i",
+    22.11,
+    22.36
+   ],
+   [
+    "added",
+    22.36,
+    22.78
+   ],
+   [
+    "economics",
+    22.78,
+    23.81
+   ]
+  ],
+  "scene": "delhi"
+ },
+ {
+  "segment": 5,
+  "start": 24.88,
+  "end": 27.16,
+  "captions": [
+   [
+    0,
+    "Then, five years at HARMAN in Bengaluru,"
+   ]
+  ],
+  "beats": {},
+  "words": [
+   [
+    "then",
+    24.88,
+    25.13
+   ],
+   [
+    "five",
+    25.13,
+    25.41
+   ],
+   [
+    "years",
+    25.41,
+    25.65
+   ],
+   [
+    "at",
+    25.65,
+    25.94
+   ],
+   [
+    "harman",
+    25.94,
+    26.46
+   ],
+   [
+    "in",
+    26.46,
+    26.6
+   ],
+   [
+    "bengaluru",
+    26.6,
+    27.11
+   ]
+  ],
+  "scene": "drive"
+ },
+ {
+  "segment": 6,
+  "start": 27.76,
+  "end": 31.17,
+  "captions": [
+   [
+    0,
+    "building navigation for cars and trucks."
+   ],
+   [
+    6,
+    "One thing I'm proud of:"
+   ]
+  ],
+  "beats": {},
+  "words": [
+   [
+    "building",
+    27.76,
+    28.07
+   ],
+   [
+    "navigation",
+    28.07,
+    28.68
+   ],
+   [
+    "for",
+    28.68,
+    28.81
+   ],
+   [
+    "cars",
+    28.81,
+    29.15
+   ],
+   [
+    "and",
+    29.15,
+    29.3
+   ],
+   [
+    "trucks",
+    29.3,
+    29.73
+   ],
+   [
+    "one",
+    29.73,
+    30.04
+   ],
+   [
+    "thing",
+    30.04,
+    30.29
+   ],
+   [
+    "i'm",
+    30.29,
+    30.4
+   ],
+   [
+    "proud",
+    30.4,
+    30.71
+   ],
+   [
+    "of",
+    30.71,
+    31.17
+   ]
+  ],
+  "scene": "drive"
+ },
+ {
+  "segment": 7,
+  "start": 31.99,
+  "end": 34.44,
+  "captions": [
+   [
+    0,
+    "When a truck's camera can't see a speed sign,"
+   ]
+  ],
+  "beats": {
+   "camera": 3
+  },
+  "words": [
+   [
+    "when",
+    31.99,
+    32.17
+   ],
+   [
+    "a",
+    32.17,
+    32.23
+   ],
+   [
+    "truck's",
+    32.23,
+    32.64
+   ],
+   [
+    "camera",
+    32.64,
+    33.07
+   ],
+   [
+    "can't",
+    33.07,
+    33.4
+   ],
+   [
+    "see",
+    33.4,
+    33.64
+   ],
+   [
+    "a",
+    33.64,
+    33.67
+   ],
+   [
+    "speed",
+    33.67,
+    34.07
+   ],
+   [
+    "sign",
+    34.07,
+    34.43
+   ]
+  ],
+  "scene": "drive"
+ },
+ {
+  "segment": 8,
+  "start": 34.95,
+  "end": 36.79,
+  "captions": [
+   [
+    0,
+    "our map data still knows it."
+   ]
+  ],
+  "beats": {},
+  "words": [
+   [
+    "our",
+    34.95,
+    35.08
+   ],
+   [
+    "map",
+    35.08,
+    35.45
+   ],
+   [
+    "data",
+    35.45,
+    35.73
+   ],
+   [
+    "still",
+    35.73,
+    36.01
+   ],
+   [
+    "knows",
+    36.01,
+    36.35
+   ],
+   [
+    "it",
+    36.35,
+    36.79
+   ]
+  ],
+  "scene": "drive"
+ },
+ {
+  "segment": 9,
+  "start": 38.05,
+  "end": 42.96,
+  "captions": [
+   [
+    0,
+    "But I kept having business doubts."
+   ],
+   [
+    6,
+    "As an engineer, you get tasks, not a vote."
+   ]
+  ],
+  "beats": {
+   "tasks": 9
+  },
+  "words": [
+   [
+    "but",
+    38.05,
+    38.32
+   ],
+   [
+    "i",
+    38.32,
+    38.38
+   ],
+   [
+    "kept",
+    38.38,
+    38.71
+   ],
+   [
+    "having",
+    38.71,
+    39.13
+   ],
+   [
+    "business",
+    39.13,
+    39.54
+   ],
+   [
+    "doubts",
+    39.54,
+    40.3
+   ],
+   [
+    "as",
+    40.3,
+    40.51
+   ],
+   [
+    "an",
+    40.51,
+    40.64
+   ],
+   [
+    "engineer",
+    40.64,
+    41.22
+   ],
+   [
+    "you",
+    41.22,
+    41.53
+   ],
+   [
+    "get",
+    41.53,
+    41.78
+   ],
+   [
+    "tasks",
+    41.78,
+    42.36
+   ],
+   [
+    "not",
+    42.36,
+    42.58
+   ],
+   [
+    "a",
+    42.58,
+    42.66
+   ],
+   [
+    "vote",
+    42.66,
+    42.95
+   ]
+  ],
+  "scene": "doubt"
+ },
+ {
+  "segment": 10,
+  "start": 43.69,
+  "end": 47.34,
+  "captions": [
+   [
+    0,
+    "And a lot of effort went into things|that just didn't make business sense."
+   ]
+  ],
+  "beats": {
+   "bizSense": 11
+  },
+  "words": [
+   [
+    "and",
+    43.69,
+    43.88
+   ],
+   [
+    "a",
+    43.88,
+    43.91
+   ],
+   [
+    "lot",
+    43.91,
+    44.01
+   ],
+   [
+    "of",
+    44.01,
+    44.28
+   ],
+   [
+    "effort",
+    44.28,
+    44.69
+   ],
+   [
+    "went",
+    44.69,
+    44.85
+   ],
+   [
+    "into",
+    44.85,
+    45.06
+   ],
+   [
+    "things",
+    45.06,
+    45.37
+   ],
+   [
+    "that",
+    45.37,
+    45.65
+   ],
+   [
+    "just",
+    45.65,
+    45.98
+   ],
+   [
+    "didn't",
+    45.98,
+    46.18
+   ],
+   [
+    "make",
+    46.18,
+    46.38
+   ],
+   [
+    "business",
+    46.38,
+    46.95
+   ],
+   [
+    "sense",
+    46.95,
+    47.34
+   ]
+  ],
+  "scene": "doubt"
+ },
+ {
+  "segment": 11,
+  "start": 49.12,
+  "end": 53.21,
+  "captions": [
+   [
+    0,
+    "I wanted to help decide what gets built,|not just how."
+   ]
+  ],
+  "beats": {
+   "notJustHow": 8
+  },
+  "words": [
+   [
+    "i",
+    49.37,
+    49.42
+   ],
+   [
+    "wanted",
+    49.42,
+    49.71
+   ],
+   [
+    "to",
+    49.71,
+    49.84
+   ],
+   [
+    "help",
+    49.84,
+    50.05
+   ],
+   [
+    "decide",
+    50.05,
+    50.57
+   ],
+   [
+    "what",
+    50.57,
+    51.33
+   ],
+   [
+    "gets",
+    51.33,
+    51.61
+   ],
+   [
+    "built",
+    51.61,
+    52.11
+   ],
+   [
+    "not",
+    52.11,
+    52.33
+   ],
+   [
+    "just",
+    52.33,
+    52.6
+   ],
+   [
+    "how",
+    52.6,
+    53.21
+   ]
+  ],
+  "scene": "recalc"
+ },
+ {
+  "segment": 12,
+  "start": 53.63,
+  "end": 55.03,
+  "captions": [
+   [
+    0,
+    "So, I recalculated."
+   ]
+  ],
+  "beats": {
+   "turn": 2
+  },
+  "words": [
+   [
+    "so",
+    53.63,
+    53.85
+   ],
+   [
+    "i",
+    53.85,
+    53.93
+   ],
+   [
+    "recalculated",
+    53.93,
+    55.03
+   ]
+  ],
+  "scene": "recalc"
+ },
+ {
+  "segment": 13,
+  "start": 56.38,
+  "end": 58.85,
+  "captions": [
+   [
+    0,
+    "In 2025, I moved to the US."
+   ]
+  ],
+  "beats": {},
+  "words": [
+   [
+    "in",
+    56.38,
+    56.69
+   ],
+   [
+    "twenty",
+    56.69,
+    57.08
+   ],
+   [
+    "twenty",
+    57.08,
+    57.31
+   ],
+   [
+    "five",
+    57.31,
+    57.81
+   ],
+   [
+    "i",
+    57.81,
+    57.89
+   ],
+   [
+    "moved",
+    57.89,
+    58.13
+   ],
+   [
+    "to",
+    58.13,
+    58.23
+   ],
+   [
+    "the",
+    58.23,
+    58.34
+   ],
+   [
+    "us",
+    58.34,
+    58.85
+   ]
+  ],
+  "scene": "flight"
+ },
+ {
+  "segment": 14,
+  "start": 59.38,
+  "end": 62.45,
+  "captions": [
+   [
+    0,
+    "It's where AI is being built,|and I wanted to be there."
+   ]
+  ],
+  "beats": {},
+  "words": [
+   [
+    "it's",
+    59.38,
+    59.59
+   ],
+   [
+    "where",
+    59.59,
+    59.68
+   ],
+   [
+    "ai",
+    59.68,
+    60.09
+   ],
+   [
+    "is",
+    60.09,
+    60.49
+   ],
+   [
+    "being",
+    60.49,
+    60.72
+   ],
+   [
+    "built",
+    60.72,
+    61.22
+   ],
+   [
+    "and",
+    61.22,
+    61.36
+   ],
+   [
+    "i",
+    61.36,
+    61.41
+   ],
+   [
+    "wanted",
+    61.41,
+    62.45
+   ]
+  ],
+  "scene": "flight"
+ },
+ {
+  "segment": 17,
+  "start": 70.84,
+  "end": 73.76,
+  "captions": [
+   [
+    0,
+    "At Duke, engineering management|gave me the business side:"
+   ]
+  ],
+  "beats": {},
+  "words": [
+   [
+    "at",
+    70.84,
+    71.2
+   ],
+   [
+    "duke",
+    71.2,
+    71.72
+   ],
+   [
+    "engineering",
+    71.72,
+    72.21
+   ],
+   [
+    "management",
+    72.21,
+    72.68
+   ],
+   [
+    "gave",
+    72.68,
+    72.91
+   ],
+   [
+    "me",
+    72.91,
+    73.0
+   ],
+   [
+    "the",
+    73.0,
+    73.07
+   ],
+   [
+    "business",
+    73.07,
+    73.45
+   ],
+   [
+    "side",
+    73.45,
+    73.76
+   ]
+  ],
+  "scene": "duke"
+ },
+ {
+  "segment": 18,
+  "start": 74.24,
+  "end": 76.38,
+  "captions": [
+   [
+    0,
+    "strategy, finance, marketing."
+   ]
+  ],
+  "beats": {
+   "strategy": 0
+  },
+  "words": [
+   [
+    "strategy",
+    74.24,
+    74.96
+   ],
+   [
+    "finance",
+    74.96,
+    75.7
+   ],
+   [
+    "marketing",
+    75.7,
+    76.33
+   ]
+  ],
+  "scene": "duke"
+ },
+ {
+  "segment": 20,
+  "start": 81.85,
+  "end": 85.25,
+  "captions": [
+   [
+    0,
+    "Design Thinking taught me|how to really interview customers."
+   ]
+  ],
+  "beats": {
+   "design": 0
+  },
+  "words": [
+   [
+    "design",
+    81.85,
+    82.19
+   ],
+   [
+    "thinking",
+    82.19,
+    82.53
+   ],
+   [
+    "taught",
+    82.53,
+    82.81
+   ],
+   [
+    "me",
+    82.81,
+    82.93
+   ],
+   [
+    "how",
+    82.93,
+    83.14
+   ],
+   [
+    "to",
+    83.14,
+    83.27
+   ],
+   [
+    "really",
+    83.27,
+    83.76
+   ],
+   [
+    "interview",
+    83.76,
+    84.25
+   ],
+   [
+    "customers",
+    84.25,
+    85.25
+   ]
+  ],
+  "scene": "duke"
+ },
+ {
+  "segment": 21,
+  "start": 85.62,
+  "end": 88.56,
+  "captions": [
+   [
+    0,
+    "After 15+ interviews, the lesson was simple:"
+   ]
+  ],
+  "beats": {
+   "after": 0
+  },
+  "words": [
+   [
+    "after",
+    85.62,
+    85.88
+   ],
+   [
+    "fifteen",
+    85.88,
+    86.37
+   ],
+   [
+    "plus",
+    86.37,
+    86.72
+   ],
+   [
+    "interviews",
+    86.72,
+    87.37
+   ],
+   [
+    "the",
+    87.37,
+    87.55
+   ],
+   [
+    "lesson",
+    87.55,
+    87.89
+   ],
+   [
+    "was",
+    87.89,
+    88.0
+   ],
+   [
+    "simple",
+    88.0,
+    88.45
+   ]
+  ],
+  "scene": "duke"
+ },
+ {
+  "segment": 22,
+  "start": 88.98,
+  "end": 91.79,
+  "captions": [
+   [
+    0,
+    "People weren't missing information.|They were missing trust."
+   ]
+  ],
+  "beats": {
+   "people": 0,
+   "trust": 7
+  },
+  "words": [
+   [
+    "people",
+    88.98,
+    89.34
+   ],
+   [
+    "weren't",
+    89.34,
+    89.58
+   ],
+   [
+    "missing",
+    89.58,
+    89.93
+   ],
+   [
+    "information",
+    89.93,
+    90.56
+   ],
+   [
+    "they",
+    90.56,
+    90.66
+   ],
+   [
+    "were",
+    90.66,
+    90.77
+   ],
+   [
+    "missing",
+    90.77,
+    91.16
+   ],
+   [
+    "trust",
+    91.16,
+    91.79
+   ]
+  ],
+  "scene": "duke"
+ },
+ {
+  "segment": 23,
+  "start": 93.92,
+  "end": 99.81,
+  "captions": [
+   [
+    0,
+    "And on the side, I'm a little obsessed|with credit card points."
+   ],
+   [
+    12,
+    "I was optimizing everything by hand,"
+   ]
+  ],
+  "beats": {},
+  "words": [
+   [
+    "and",
+    93.92,
+    94.3
+   ],
+   [
+    "on",
+    94.3,
+    94.45
+   ],
+   [
+    "the",
+    94.45,
+    94.52
+   ],
+   [
+    "side",
+    94.52,
+    95.04
+   ],
+   [
+    "i'm",
+    95.04,
+    95.28
+   ],
+   [
+    "a",
+    95.28,
+    95.37
+   ],
+   [
+    "little",
+    95.37,
+    95.63
+   ],
+   [
+    "obsessed",
+    95.63,
+    96.11
+   ],
+   [
+    "with",
+    96.11,
+    96.22
+   ],
+   [
+    "credit",
+    96.22,
+    96.5
+   ],
+   [
+    "card",
+    96.5,
+    96.72
+   ],
+   [
+    "points",
+    96.72,
+    97.43
+   ],
+   [
+    "i",
+    97.43,
+    97.53
+   ],
+   [
+    "was",
+    97.53,
+    97.73
+   ],
+   [
+    "optimizing",
+    97.73,
+    98.33
+   ],
+   [
+    "everything",
+    98.33,
+    98.89
+   ],
+   [
+    "by",
+    98.89,
+    99.27
+   ],
+   [
+    "hand",
+    99.27,
+    99.81
+   ]
+  ],
+  "scene": "pointsmax"
+ },
+ {
+  "segment": 24,
+  "start": 100.09,
+  "end": 103.82,
+  "captions": [
+   [
+    0,
+    "and couldn't find a tool that did it,"
+   ],
+   [
+    8,
+    "so I built one: PointsMax."
+   ]
+  ],
+  "beats": {
+   "builtOne": 8,
+   "points": 12
+  },
+  "words": [
+   [
+    "and",
+    100.09,
+    100.19
+   ],
+   [
+    "couldn't",
+    100.19,
+    100.45
+   ],
+   [
+    "find",
+    100.45,
+    100.67
+   ],
+   [
+    "a",
+    100.67,
+    100.75
+   ],
+   [
+    "tool",
+    100.75,
+    101.09
+   ],
+   [
+    "that",
+    101.09,
+    101.41
+   ],
+   [
+    "did",
+    101.41,
+    101.61
+   ],
+   [
+    "it",
+    101.61,
+    101.91
+   ],
+   [
+    "so",
+    101.91,
+    102.21
+   ],
+   [
+    "i",
+    102.21,
+    102.33
+   ],
+   [
+    "built",
+    102.33,
+    102.69
+   ],
+   [
+    "one",
+    102.69,
+    102.87
+   ],
+   [
+    "points",
+    102.87,
+    103.38
+   ],
+   [
+    "max",
+    103.38,
+    103.82
+   ]
+  ],
+  "scene": "pointsmax"
+ },
+ {
+  "segment": 25,
+  "start": 104.76,
+  "end": 105.61,
+  "captions": [
+   [
+    0,
+    "Next stop?"
+   ]
+  ],
+  "beats": {},
+  "words": [
+   [
+    "next",
+    104.76,
+    105.04
+   ],
+   [
+    "stop",
+    105.04,
+    105.61
+   ]
+  ],
+  "scene": "finale"
+ },
+ {
+  "segment": 26,
+  "start": 106.03,
+  "end": 108.55,
+  "captions": [
+   [
+    0,
+    "A team that moves fast, has fun,"
+   ]
+  ],
+  "beats": {},
+  "words": [
+   [
+    "a",
+    106.03,
+    106.18
+   ],
+   [
+    "team",
+    106.18,
+    106.43
+   ],
+   [
+    "that",
+    106.43,
+    106.62
+   ],
+   [
+    "moves",
+    106.62,
+    106.92
+   ],
+   [
+    "fast",
+    106.92,
+    107.48
+   ],
+   [
+    "has",
+    107.48,
+    107.85
+   ],
+   [
+    "fun",
+    107.85,
+    108.55
+   ]
+  ],
+  "scene": "finale"
+ },
+ {
+  "segment": 27,
+  "start": 108.73,
+  "end": 110.95,
+  "captions": [
+   [
+    0,
+    "and makes a real dent."
+   ],
+   [
+    5,
+    "Maybe yours."
+   ]
+  ],
+  "beats": {
+   "maybe": 5
+  },
+  "words": [
+   [
+    "and",
+    108.73,
+    108.84
+   ],
+   [
+    "makes",
+    108.84,
+    109.05
+   ],
+   [
+    "a",
+    109.05,
+    109.11
+   ],
+   [
+    "real",
+    109.11,
+    109.34
+   ],
+   [
+    "dent",
+    109.34,
+    109.64
+   ],
+   [
+    "maybe",
+    109.93,
+    110.24
+   ],
+   [
+    "yours",
+    110.24,
+    110.95
+   ]
+  ],
+  "scene": "finale"
+ }
+]
